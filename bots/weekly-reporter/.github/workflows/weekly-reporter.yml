@@ -17,6 +17,12 @@ jobs:
       - name: 📋 Issue
         env: { GH_TOKEN: '${{ secrets.GITHUB_TOKEN }}' }
         run: |
-          gh label create "documentation" --force 2>/dev/null || true
-          gh label create "automated" --force 2>/dev/null || true
-          gh issue create --title "📊 Weekly Report — $(date +%Y-%m-%d)" --body "$(cat weekly-reporter-report.md)" --label "documentation,automated" || echo "Issue creation skipped"
+          TITLE="📊 Weekly Report — $(date +%Y-%m-%d)"
+          BODY=$(cat weekly-reporter-report.md)
+          # Skip if issue already exists today
+          EXISTING=$(gh issue list --state open --search "$TITLE" --json number --jq 'length' 2>/dev/null || echo "0")
+          if [ "$EXISTING" -eq 0 ]; then
+            gh issue create --title "$TITLE" --body "$BODY" || echo "Issue created with warnings"
+          else
+            echo "Weekly report already exists for today"
+          fi
