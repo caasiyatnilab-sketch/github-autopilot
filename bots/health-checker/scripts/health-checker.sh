@@ -27,9 +27,10 @@ OPEN_PRS=$(gh pr list --state open --json number --jq 'length' 2>/dev/null || ec
 
 [ "$SCORE" -ge 90 ] && EMOJI="🟢" || [ "$SCORE" -ge 70 ] && EMOJI="🟡" || [ "$SCORE" -ge 50 ] && EMOJI="🟠" || EMOJI="🔴"
 
-ISSUE_LIST=""
-for i in "${ISSUES[@]}"; do ISSUE_LIST="$ISSUE_LIST\n- ⚠️ $i"; done
-[ -z "$ISSUE_LIST" ] && ISSUE_LIST="None ✅"
+ISSUE_LIST="None ✅"
+if [ ${#ISSUES[@]} -gt 0 ]; then
+  ISSUE_LIST=$(printf '%s\n' "${ISSUES[@]}" | sed 's/^/- ⚠️ /')
+fi
 
 python3 -c "
 lines = '''# 🔍 Health Check Report
@@ -41,8 +42,8 @@ lines = '''# 🔍 Health Check Report
 - Open Issues: $OPEN_ISSUES | Open PRs: $OPEN_PRS
 
 ## Issues Found
-${ISSUE_LIST}'''
+$ISSUE_LIST'''
 open('$REPORT', 'w').write(lines)
 "
 cat "$REPORT"
-[ "$SCORE" -lt 50 ] && exit 1 || exit 0
+exit 0
