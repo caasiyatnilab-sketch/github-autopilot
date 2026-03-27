@@ -1,0 +1,38 @@
+name: 📰 Daily Briefing
+on:
+  schedule:
+    - cron: '0 8 * * *'  # 8AM UTC daily
+  workflow_dispatch:
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+  actions: read
+jobs:
+  briefing:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: 📰 Run Briefing
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+          NOTIFY_EMAIL: ${{ secrets.NOTIFY_EMAIL }}
+          PUSHOVER_TOKEN: ${{ secrets.PUSHOVER_TOKEN }}
+          PUSHOVER_USER: ${{ secrets.PUSHOVER_USER }}
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        run: |
+          source shared/utils.sh
+          chmod +x bots/daily-briefing/scripts/daily-briefing.sh
+          bash bots/daily-briefing/scripts/daily-briefing.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: daily-briefing
+          path: daily-briefing-report.md

@@ -1,33 +1,53 @@
 # 🚀 GitHub Autopilot — Unstoppable Bot Army
 
-A complete autonomous GitHub automation system. Install once, never touch again.
+**15 autonomous bots** that run your GitHub repos. Install once, never touch again.
 
 ## 🤖 Bot Roster
 
 ### Core Bots (Project Health)
-| Bot | What it does | Runs |
-|-----|-------------|------|
-| 🔍 **health-checker** | Repo health scoring, CI monitoring, config audit | Daily 6AM UTC |
-| 🔒 **security-scanner** | Vulnerability audit, secret detection, CodeQL | Daily 2AM UTC + push |
-| 📦 **auto-updater** | Dependency updates, npm audit fix, auto-PRs | Monday 8AM UTC |
-| 🏷️ **issue-pr-manager** | Auto-label, stale cleanup, welcome msgs, PR size | On events + daily |
-| 🛠️ **auto-fixer** | ESLint, Prettier, auto-fix bugs, .gitignore | On push to main |
-| 📊 **weekly-reporter** | Activity summary, stats, recommendations | Friday 5PM UTC |
+| Bot | Schedule | What it does |
+|-----|----------|-------------|
+| 🔍 **health-checker** | Daily 6AM | CI monitoring, branch protection, config audit, health scoring |
+| 🔒 **security-scanner** | Daily 2AM + push | Vulnerability audit, secret detection, npm audit, CodeQL |
+| 📦 **auto-updater** | Monday 8AM | Dependency updates, npm audit fix, auto-PRs |
+| 🏷️ **issue-pr-manager** | On events + daily | Auto-label, stale cleanup, welcome msgs, PR size labels |
+| 🛠️ **auto-fixer** | On push to main | ESLint, Prettier, whitespace, .gitignore, auto-PR with fixes |
+| 📊 **weekly-reporter** | Friday 5PM | Activity summary, stats, CI, security, recommendations |
 
 ### Power Bots (Autonomous Operations)
-| Bot | What it does | Runs |
-|-----|-------------|------|
-| 🌐 **api-hunter** | 24/7 freemium API finder — AI models, tools, services | Every 6 hours |
-| 🏗️ **repo-builder** | Auto-creates repos from templates, scaffolds projects | On demand + weekly |
-| 🕷️ **scraper-bot** | Website scraping, data extraction, monitoring | On demand + daily |
-| 🚀 **deploy-bot** | Free deploy websites/apps (Vercel, Netlify, GH Pages) | On push to main |
-| 🔑 **copilot-rotator** | API key rotation, Copilot management, key health | Every 12 hours |
-| 🧠 **ai-agent-factory** | Builds and deploys AI agent templates | Weekly + on demand |
+| Bot | Schedule | What it does |
+|-----|----------|-------------|
+| 🌐 **api-hunter** | Every 6 hours | 50+ freemium APIs catalogued — AI, tools, deploy, data |
+| 🏗️ **repo-builder** | Monday 9AM | 12 project templates, auto-create repos from ideas JSON |
+| 🕷️ **scraper-bot** | Daily 4AM | Website scraping, data extraction, change monitoring |
+| 🚀 **deploy-bot** | On push to main | Auto-deploy to Vercel, Netlify, GitHub Pages (free) |
+| 🔑 **copilot-rotator** | Every 12 hours | API key health checks, free key discovery, rotation |
+| 🧠 **ai-agent-factory** | Monday 10AM | Build chatbot, code reviewer, data analyst, content writer agents |
+
+### Communication Bots (Freemium Notifications)
+| Bot | Schedule | What it does |
+|-----|----------|-------------|
+| 📬 **notification-bot** | 3x daily + on failure | Multi-channel alerts: Email, Telegram, Discord, Slack, phone push |
+| 📰 **daily-briefing** | Daily 8AM | Comprehensive daily email/notification with everything |
 
 ### Orchestrator
-| Bot | What it does | Runs |
-|-----|-------------|------|
-| 🎯 **autopilot** | Master controller — coordinates all bots, monitors health | Every hour |
+| Bot | Schedule | What it does |
+|-----|----------|-------------|
+| 🎯 **autopilot** | Every 4 hours | Master controller — monitors all bots, system health |
+
+## 📬 Notification Channels (All Free/Freemium)
+
+| Channel | Free Tier | Setup |
+|---------|-----------|-------|
+| **ntfy.sh** | Unlimited (no signup!) | Auto — just subscribe to your topic |
+| **Telegram** | Unlimited | Create bot via @BotFather, add secrets |
+| **Discord** | Unlimited webhooks | Create webhook in server settings |
+| **Slack** | Unlimited webhooks | Create app at api.slack.com |
+| **Email (Resend)** | 100/day | Sign up at resend.com |
+| **Email (Brevo)** | 300/day | Sign up at brevo.com |
+| **Email (Mailgun)** | 100/day (3 months) | Sign up at mailgun.com |
+| **Pushover** | 7,500/month | Sign up at pushover.net |
+| **GitHub Issues** | Always | Auto-created on failures |
 
 ## 🚀 One-Command Install
 
@@ -35,103 +55,82 @@ A complete autonomous GitHub automation system. Install once, never touch again.
 bash <(curl -s https://raw.githubusercontent.com/YOUR_USERNAME/github-autopilot/main/setup.sh)
 ```
 
-Or install individual bots:
+Install specific bot only:
 ```bash
-bash <(curl -s https://raw.githubusercontent.com/YOUR_USERNAME/github-autopilot/main/setup.sh) --bot api-hunter
+bash setup.sh --bot api-hunter
 ```
 
 ## ⚙️ Configuration
 
-Each bot reads from `.github/autopilot.yml`:
-
+`.github/autopilot.yml`:
 ```yaml
-# .github/autopilot.yml
 autopilot:
   enabled: true
-  github_token: "${{ secrets.GITHUB_TOKEN }}"
 
 api_hunter:
   enabled: true
-  categories:
-    - ai_models
-    - text_generation
-    - image_generation
-    - translation
-    - speech
-    - code_assist
-  save_to: ".github/found-apis.json"
-  notify: true
-
-repo_builder:
-  enabled: true
-  templates_dir: ".github/project-templates/"
-  auto_create: true
-
-scraper_bot:
-  enabled: true
-  targets:
-    - url: "https://example.com"
-      schedule: "daily"
-      extract: "links,headlines"
+  categories: [ai_models, tools, deploy]
 
 deploy_bot:
   enabled: true
-  providers:
-    - vercel
-    - netlify
-    - github_pages
-  auto_deploy_on_push: true
+  providers: [vercel, netlify, github_pages]
 
 copilot_rotator:
   enabled: true
-  providers:
-    - github_copilot
-    - openai
-    - anthropic
-    - google
-  rotation_schedule: "every_12h"
-  min_free_tier: true
+  providers: [groq, openrouter, mistral]
 
 ai_agent_factory:
   enabled: true
-  templates:
-    - chatbot
-    - code_reviewer
-    - data_analyst
-    - content_writer
-    - api_connector
-  deploy_to: "replit"  # or "vercel", "railway"
+  templates: [chatbot, code_reviewer, data_analyst]
 ```
+
+## 🔑 GitHub Secrets (Optional — Add What You Need)
+
+### AI API Keys (for copilot-rotator, ai-agent-factory)
+- `GROQ_API_KEY` — Free at [console.groq.com](https://console.groq.com)
+- `OPENROUTER_API_KEY` — Free at [openrouter.ai/keys](https://openrouter.ai/keys)
+- `MISTRAL_API_KEY` — Free at [console.mistral.ai](https://console.mistral.ai)
+- `TOGETHER_API_KEY` — Free at [api.together.xyz](https://api.together.xyz)
+
+### Notifications
+- `DISCORD_WEBHOOK` — Discord webhook URL
+- `SLACK_WEBHOOK` — Slack webhook URL
+- `TELEGRAM_BOT_TOKEN` — From @BotFather
+- `TELEGRAM_CHAT_ID` — From @userinfobot
+- `RESEND_API_KEY` — From resend.com
+- `BREVO_API_KEY` — From brevo.com
+- `NOTIFY_EMAIL` — Your email address
+- `PUSHOVER_TOKEN` — From pushover.net
+- `PUSHOVER_USER` — From pushover.net
+- `NTFY_TOPIC` — Custom ntfy.sh topic (default: github-autopilot)
 
 ## 📁 Structure
 
 ```
 github-autopilot/
+├── .github/workflows/     # All 15 workflow files
 ├── bots/
-│   ├── health-checker/     # Core: repo health
-│   ├── security-scanner/   # Core: security
-│   ├── auto-updater/       # Core: dependencies
-│   ├── issue-pr-manager/   # Core: issue/PR automation
-│   ├── auto-fixer/         # Core: code fixes
-│   ├── weekly-reporter/    # Core: reports
-│   ├── api-hunter/         # Power: find free APIs
-│   ├── repo-builder/       # Power: create repos/projects
-│   ├── scraper-bot/        # Power: scrape websites
-│   ├── deploy-bot/         # Power: deploy for free
-│   ├── copilot-rotator/    # Power: key rotation
-│   ├── ai-agent-factory/   # Power: build AI agents
-│   └── autopilot/          # Orchestrator
-├── shared/                 # Shared utilities
-├── templates/              # Project templates
-└── docs/                   # Documentation
+│   ├── health-checker/
+│   ├── security-scanner/
+│   ├── auto-updater/
+│   ├── issue-pr-manager/
+│   ├── auto-fixer/
+│   ├── weekly-reporter/
+│   ├── api-hunter/        # 50+ free APIs
+│   ├── repo-builder/      # 12 project templates
+│   ├── scraper-bot/
+│   ├── deploy-bot/
+│   ├── copilot-rotator/
+│   ├── ai-agent-factory/  # 4 AI agent templates
+│   ├── notification-bot/  # 8 notification channels
+│   ├── daily-briefing/    # Daily comprehensive update
+│   └── autopilot/         # Master orchestrator
+├── shared/
+│   └── utils.sh           # Shared utilities
+├── templates/
+│   └── autopilot.yml      # Config template
+└── setup.sh               # One-command installer
 ```
-
-## 🔒 Security
-
-- All secrets use GitHub Secrets
-- No credentials in code
-- Isolated bot permissions
-- Audit logging on all operations
 
 ## 📝 License
 
