@@ -305,3 +305,28 @@ get_configured_providers() {
   [ -n "${ANTHROPIC_API_KEY:-}" ] && providers+=("anthropic")
   echo "${providers[@]}"
 }
+
+# ═══════════════════════════════════════════════════════
+# AI Helper — call Groq API for any bot
+# ═══════════════════════════════════════════════════════
+ai_ask() {
+  local prompt="$1"
+  local model="${2:-llama-3.1-8b-instant}"
+  local key="${GROQ_API_KEY:-}"
+  [ -z "$key" ] && return 1
+  RESPONSE=$(curl -s "https://api.groq.com/openai/v1/chat/completions" \
+    -H "Authorization: Bearer $key" \
+    -H "Content-Type: application/json" \
+    -d "{\"model\":\"$model\",\"messages\":[{\"role\":\"user\",\"content\":\"$prompt\"}],\"max_tokens\":2048}" 2>/dev/null)
+  echo "$RESPONSE" | jq -r '.choices[0].message.content // empty' 2>/dev/null
+}
+
+ai_code() {
+  local task="$1"
+  ai_ask "You are a senior full-stack developer. Generate complete, production-ready code for: $task. Output ONLY code, no explanations." "llama-3.3-70b-versatile"
+}
+
+ai_review() {
+  local code="$1"
+  ai_ask "Review this code for bugs, security issues, and improvements. Be specific: $code" "llama-3.3-70b-versatile"
+}
