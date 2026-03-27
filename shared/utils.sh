@@ -328,7 +328,7 @@ ai_ask() {
     RESULT=$(curl -s "https://openrouter.ai/api/v1/chat/completions" \
       -H "Authorization: Bearer $OPENROUTER_API_KEY" \
       -H "Content-Type: application/json" \
-      -d "{\"model\":\"${model:-meta-llama/llama-3.1-8b-instruct:free}\",\"messages\":[{\"role\":\"user\",\"content\":\"$prompt\"}],\"max_tokens\":2048}" 2>/dev/null)
+      -d "{\"model\":\"${model:-openrouter/free}\",\"messages\":[{\"role\":\"user\",\"content\":\"$prompt\"}],\"max_tokens\":2048}" 2>/dev/null)
     REPLY=$(echo "$RESULT" | jq -r '.choices[0].message.content // empty' 2>/dev/null)
     [ -n "$REPLY" ] && echo "$REPLY" && return 0
   fi
