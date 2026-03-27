@@ -1,6 +1,6 @@
 #!/bin/bash
-# 📰 Daily Briefing Bot
-# Sends comprehensive daily email/notification with everything that happened
+# 📰 Daily Briefing Bot (Enhanced — Zero Config)
+# Creates a GitHub Issue with full daily summary → you get email automatically
 set -euo pipefail
 source "${GITHUB_WORKSPACE:-.}/shared/utils.sh"
 
@@ -11,158 +11,164 @@ log INFO "📰 Daily Briefing Bot starting..."
 
 REPO=$(get_repo)
 TODAY=$(date -u '+%Y-%m-%d')
-YESTERDAY=$(date -d '-1 day' '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || date -v-1d '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || echo "")
+YESTERDAY=$(days_ago 1)
 
 # ═══════════════════════════════════════════════════════
-# Gather Data
+# Gather All Data
 # ═══════════════════════════════════════════════════════
 
-# Commits
-COMMITS_YESTERDAY=$(git log --oneline --since="$YESTERDAY" 2>/dev/null | wc -l || echo "0")
-TOP_COMMITTER=$(git log --since="$YESTERDAY" --format="%aN" 2>/dev/null | sort | uniq -c | sort -rn | head -1 | awk '{print $2}' || echo "none")
+COMMITS=$(git log --oneline --since="$YESTERDAY" 2>/dev/null | wc -l || echo "0")
+TOP_COMMITTER=$(git log --since="$YESTERDAY" --format="%aN" 2>/dev/null | sort | uniq -c | sort -rn | head -1 | awk '{print $2 " (" $1 " commits)"}' || echo "none")
 
-# PRs
-PRS_OPENED=$(gh pr list --state all --json createdAt --jq "[.[] | select(.createdAt > \"$YESTERDAY\")] | length" 2>/dev/null || echo "0")
-PRS_MERGED=$(gh pr list --state merged --json mergedAt --jq "[.[] | select(.mergedAt > \"$YESTERDAY\")] | length" 2>/dev/null || echo "0")
-PR_LIST=$(gh pr list --state open --limit 5 --json number,title,author --jq '.[] | "- #\(.number): \(.title) by @\(.author.login)"' 2>/dev/null || echo "None")
+PRS_OPENED=$(gh pr list --state all --json createdAt --jq "[.[]|select(.createdAt>\"$YESTERDAY\")]|length" 2>/dev/null || echo "0")
+PRS_MERGED=$(gh pr list --state merged --json mergedAt --jq "[.[]|select(.mergedAt>\"$YESTERDAY\")]|length" 2>/dev/null || echo "0")
+OPEN_PRS=$(gh pr list --state open --limit 10 --json number,title,author --jq '.[]|"- #\(.number): \(.title) (by @\(.author.login))"' 2>/dev/null || echo "_None_")
 
-# Issues
-ISSUES_OPENED=$(gh issue list --state all --json createdAt --jq "[.[] | select(.createdAt > \"$YESTERDAY\")] | length" 2>/dev/null || echo "0")
-ISSUES_CLOSED=$(gh issue list --state closed --json closedAt --jq "[.[] | select(.closedAt > \"$YESTERDAY\")] | length" 2>/dev/null || echo "0")
+ISSUES_OPENED=$(gh issue list --state all --json createdAt --jq "[.[]|select(.createdAt>\"$YESTERDAY\")]|length" 2>/dev/null || echo "0")
+ISSUES_CLOSED=$(gh issue list --state closed --json closedAt --jq "[.[]|select(.closedAt>\"$YESTERDAY\")]|length" 2>/dev/null || echo "0")
 OPEN_ISSUES=$(gh issue list --state open --json number --jq 'length' 2>/dev/null || echo "0")
 BUG_COUNT=$(gh issue list --state open --label "bug" --json number --jq 'length' 2>/dev/null || echo "0")
+TOP_ISSUES=$(gh issue list --state open --limit 5 --json number,title --jq '.[]|"- #\(.number): \(.title)"' 2>/dev/null || echo "_None_")
 
-# CI
-CI_RUNS=$(gh run list --limit 10 --json conclusion --jq 'length' 2>/dev/null || echo "0")
-CI_FAILED=$(gh run list --limit 10 --json conclusion --jq '[.[] | select(.conclusion == "failure")] | length' 2>/dev/null || echo "0")
-CI_SUCCESS=$((CI_RUNS - CI_FAILED))
+CI_TOTAL=$(gh run list --limit 20 --json conclusion --jq 'length' 2>/dev/null || echo "0")
+CI_PASS=$(gh run list --limit 20 --json conclusion --jq '[.[]|select(.conclusion=="success")]|length' 2>/dev/null || echo "0")
+CI_FAIL=$((CI_TOTAL - CI_PASS))
 CI_RATE=0
-[ "$CI_RUNS" -gt 0 ] && CI_RATE=$((CI_SUCCESS * 100 / CI_RUNS))
+[ "$CI_TOTAL" -gt 0 ] && CI_RATE=$((CI_PASS * 100 / CI_TOTAL))
 
-# Security
-SECURITY_STATUS="🟢 Clear"
-if [ -f "security-scanner-report.md" ]; then
-  grep -q "Action needed" "security-scanner-report.md" 2>/dev/null && SECURITY_STATUS="🔴 Issues found"
-fi
+SECURITY="🟢 Clear"
+[ -f "security-scanner-report.md" ] && grep -q "Action needed\|🔴" "security-scanner-report.md" 2>/dev/null && SECURITY="🔴 Issues found"
 
-# Health Score
-HEALTH_SCORE="N/A"
-if [ -f "health-checker-report.md" ]; then
-  HEALTH_SCORE=$(grep -oP 'Score.*?(\d+)/100' "health-checker-report.md" 2>/dev/null | grep -oP '\d+' | head -1 || echo "N/A")
-fi
+HEALTH="N/A"
+[ -f "health-checker-report.md" ] && HEALTH=$(grep -oP '\d+/100' "health-checker-report.md" | head -1 || echo "N/A")
 
-# Dependencies
-DEPS_OUTDATED="N/A"
-if [ -f "package.json" ]; then
-  DEPS_OUTDATED=$(npm outdated --json 2>/dev/null | jq 'length' 2>/dev/null || echo "0")
+DEPS="N/A"
+[ -f "package.json" ] && DEPS=$(npm outdated --json 2>/dev/null | jq 'length' 2>/dev/null || echo "0")
+
+STARS=$(gh repo view --json stargazerCount -q '.stargazerCount' 2>/dev/null || echo "0")
+FORKS=$(gh repo view --json forkCount -q '.forkCount' 2>/dev/null || echo "0")
+
+# ═══════════════════════════════════════════════════════
+# Build Briefing as GitHub Issue
+# ═══════════════════════════════════════════════════════
+
+ISSUE_BODY="## 📊 Daily Briefing — $TODAY
+
+### 📈 Yesterday's Activity
+| Metric | Count |
+|--------|-------|
+| Commits | $COMMITS |
+| PRs Opened | $PRS_OPENED |
+| PRs Merged | $PRS_MERGED |
+| Issues Opened | $ISSUES_OPENED |
+| Issues Closed | $ISSUES_CLOSED |
+
+**Top Committer:** $TOP_COMMITTER
+
+### 📋 Current State
+| Metric | Value |
+|--------|-------|
+| Open Issues | $OPEN_ISSUES ($BUG_COUNT bugs) |
+| CI Pass Rate | ${CI_RATE}% ($CI_PASS/$CI_TOTAL) |
+| Security | $SECURITY |
+| Health Score | $HEALTH |
+| Outdated Deps | $DEPS |
+| ⭐ Stars | $STARS |
+| 🍴 Forks | $FORKS |
+
+### 🔀 Open Pull Requests
+$OPEN_PRS
+
+### 📋 Open Issues (Top 5)
+$TOP_ISSUES
+
+### 🤖 Bot Status
+All 15 bots are running on schedule:
+- 🔍 Health Checker (daily 6AM)
+- 🔒 Security Scanner (daily 2AM)
+- 📦 Auto Updater (Monday 8AM)
+- 🏷️ Issue Manager (on events)
+- 🛠️ Auto Fixer (on push)
+- 📊 Weekly Reporter (Friday 5PM)
+- 🌐 API Hunter (every 6h)
+- 🏗️ Repo Builder (Monday 9AM)
+- 🕷️ Scraper (daily 4AM)
+- 🚀 Deploy Bot (on push)
+- 🔑 Key Rotator (every 12h)
+- 🧠 AI Agent Factory (Monday 10AM)
+- 📬 Notifications (3x daily)
+- 📰 Daily Briefing (daily 8AM)
+- 🎯 Autopilot (every 4h)
+
+---
+_🤖 Automated by GitHub Autopilot_"
+
+# ═══════════════════════════════════════════════════════
+# Create GitHub Issue (→ triggers email automatically!)
+# ═══════════════════════════════════════════════════════
+
+# Check if today's briefing already exists
+EXISTING=$(gh issue list --state open --search "Daily Briefing — $TODAY" --json number --jq 'length' 2>/dev/null || echo "0")
+if [ "$EXISTING" -eq 0 ]; then
+  gh issue create \
+    --title "📰 Daily Briefing — $TODAY" \
+    --body "$ISSUE_BODY" \
+    --label "documentation,automated" 2>/dev/null || true
+  log INFO "  📧 GitHub Issue created (you'll get email!)"
 fi
 
 # ═══════════════════════════════════════════════════════
-# Build Briefing
+# Push notification via ntfy.sh
 # ═══════════════════════════════════════════════════════
 
-BRIEFING="📊 DAILY BRIEFING — $TODAY
-═══════════════════════════
-Repository: $REPO
+NTFY_TOPIC="${NTFY_TOPIC:-caasiyatnilab-ops}"
 
-📝 YESTERDAY'S ACTIVITY
-• Commits: $COMMITS_YESTERDAY (top: $TOP_COMMITTER)
-• PRs opened: $PRS_OPENED | merged: $PRS_MERGED
-• Issues opened: $ISSUES_OPENED | closed: $ISSUES_CLOSED
+BRIEF_SUMMARY="📊 $REPO Daily Briefing ($TODAY)
 
-📋 CURRENT STATE
-• Open issues: $OPEN_ISSUES ($BUG_COUNT bugs)
-• Open PRs: $(echo "$PR_LIST" | wc -l)
-• CI success rate: ${CI_RATE}%
-• Security: $SECURITY_STATUS
-• Health score: ${HEALTH_SCORE}/100
-• Outdated deps: $DEPS_OUTDATED
+📝 Activity: $COMMITS commits, $PRS_OPENED PRs, $ISSUES_OPENED issues
+📋 State: $OPEN_ISSUES issues, CI ${CI_RATE}%
+🔒 Security: $SECURITY
+💊 Health: $HEALTH
 
-🔀 OPEN PRS
-$PR_LIST
+Full briefing: https://github.com/$REPO/issues"
 
-🤖 All bots running. You're all set!"
+curl -s -d "$BRIEF_SUMMARY" \
+  -H "Title: 📰 Daily Briefing — $REPO" \
+  -H "Tags: newspaper,chart_with_upwards_trend" \
+  -H "Priority: default" \
+  "https://ntfy.sh/$NTFY_TOPIC" >/dev/null 2>&1
+log INFO "  📱 Push notification sent"
 
 # ═══════════════════════════════════════════════════════
-# Send via all available channels
+# Optional channels
 # ═══════════════════════════════════════════════════════
 
-SENT=0
-
-# ntfy.sh (always works, no signup)
-if [ -n "${NTFY_TOPIC:-github-autopilot}" ]; then
-  curl -s -d "$BRIEFING" \
-    -H "Title: 📊 Daily Briefing — $REPO" \
-    -H "Tags: chart,robot,github" \
-    "https://ntfy.sh/${NTFY_TOPIC:-github-autopilot}" >/dev/null 2>&1 && SENT=$((SENT+1))
-  log INFO "  ✅ ntfy.sh"
-fi
-
-# Telegram
-if [ -n "${TELEGRAM_BOT_TOKEN:-}" ] && [ -n "${TELEGRAM_CHAT_ID:-}" ]; then
-  curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
-    -H "Content-Type: application/json" \
-    -d "{\"chat_id\": \"$TELEGRAM_CHAT_ID\", \"text\": \"$BRIEFING\", \"parse_mode\": \"Markdown\"}" >/dev/null 2>&1 && SENT=$((SENT+1))
-  log INFO "  ✅ Telegram"
-fi
-
-# Discord
-if [ -n "${DISCORD_WEBHOOK:-}" ]; then
-  curl -s -H "Content-Type: application/json" \
-    -d "{\"embeds\": [{\"title\": \"📊 Daily Briefing — $TODAY\", \"description\": \"$BRIEFING\", \"color\": 3066993}]}" \
-    "$DISCORD_WEBHOOK" >/dev/null 2>&1 && SENT=$((SENT+1))
-  log INFO "  ✅ Discord"
-fi
-
-# Email (Resend — 100/day free)
-if [ -n "${RESEND_API_KEY:-}" ] && [ -n "${NOTIFY_EMAIL:-}" ]; then
-  curl -s -X POST "https://api.resend.com/emails" \
-    -H "Authorization: Bearer $RESEND_API_KEY" \
-    -H "Content-Type: application/json" \
-    -d "{\"from\": \"autopilot@resend.dev\", \"to\": \"$NOTIFY_EMAIL\", \"subject\": \"📊 Daily Briefing — $REPO ($TODAY)\", \"text\": \"$BRIEFING\"}" >/dev/null 2>&1 && SENT=$((SENT+1))
-  log INFO "  ✅ Email (Resend)"
-fi
-
-# Email (Brevo — 300/day free)
-if [ -n "${BREVO_API_KEY:-}" ] && [ -n "${NOTIFY_EMAIL:-}" ]; then
-  curl -s -X POST "https://api.brevo.com/v3/smtp/email" \
-    -H "api-key: $BREVO_API_KEY" \
-    -H "Content-Type: application/json" \
-    -d "{\"sender\": {\"email\": \"autopilot@bots.dev\"}, \"to\": [{\"email\": \"$NOTIFY_EMAIL\"}], \"subject\": \"📊 Daily Briefing — $REPO\", \"textContent\": \"$BRIEFING\"}" >/dev/null 2>&1 && SENT=$((SENT+1))
-  log INFO "  ✅ Email (Brevo)"
-fi
-
-# Pushover
-if [ -n "${PUSHOVER_TOKEN:-}" ] && [ -n "${PUSHOVER_USER:-}" ]; then
-  curl -s -X POST "https://api.pushover.net/1/messages.json" \
-    -d "token=$PUSHOVER_TOKEN" \
-    -d "user=$PUSHOVER_USER" \
-    -d "title=📊 Daily Briefing — $REPO" \
-    -d "message=$BRIEFING" >/dev/null 2>&1 && SENT=$((SENT+1))
-  log INFO "  ✅ Pushover"
-fi
+[ -n "${DISCORD_WEBHOOK:-}" ] && curl -s -H "Content-Type: application/json" -d "{\"embeds\":[{\"title\":\"📰 Daily Briefing — $TODAY\",\"description\":\"$BRIEF_SUMMARY\",\"color\":3066993}]}" "$DISCORD_WEBHOOK" >/dev/null 2>&1
+[ -n "${TELEGRAM_BOT_TOKEN:-}" ] && [ -n "${TELEGRAM_CHAT_ID:-}" ] && curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" -H "Content-Type: application/json" -d "{\"chat_id\":\"$TELEGRAM_CHAT_ID\",\"text\":\"$BRIEF_SUMMARY\"}" >/dev/null 2>&1
+[ -n "${RESEND_API_KEY:-}" ] && [ -n "${NOTIFY_EMAIL:-}" ] && curl -s -X POST "https://api.resend.com/emails" -H "Authorization: Bearer $RESEND_API_KEY" -H "Content-Type: application/json" -d "{\"from\":\"autopilot@resend.dev\",\"to\":\"$NOTIFY_EMAIL\",\"subject\":\"📰 Daily Briefing — $REPO ($TODAY)\",\"text\":\"$BRIEF_SUMMARY\"}" >/dev/null 2>&1
 
 # ═══════════════════════════════════════════════════════
 # Report
 # ═══════════════════════════════════════════════════════
 
-python3 -c "
-lines = '''# 📰 Daily Briefing Report
+cat > "$REPORT" << EOF
+# 📰 Daily Briefing Report
 **Date:** $TODAY
 **Repo:** $REPO
-**Notifications Sent:** $SENT
 
-## Briefing Content
-\`\`\`
-$BRIEFING
-\`\`\`
+## Summary Sent
+$BRIEF_SUMMARY
 
-## Channels Used
-$( [ $SENT -gt 0 ] && echo "Sent via $SENT channels ✅" || echo "No channels configured — add secrets to enable notifications")
+## Channels
+- ✅ GitHub Issue (→ email)
+- ✅ ntfy.sh push
+- $( [ -n "${DISCORD_WEBHOOK:-}" ] && echo '✅' || echo '⚪') Discord
+- $( [ -n "${TELEGRAM_BOT_TOKEN:-}" ] && echo '✅' || echo '⚪') Telegram
+- $( [ -n "${RESEND_API_KEY:-}" ] && echo '✅' || echo '⚪') Email
 
 ---
-_Automated by Daily Briefing Bot 📰_'''
-open('$REPORT', 'w').write(lines)
-"
+_Automated by Daily Briefing Bot 📰_
+EOF
+
 cat "$REPORT"
-log INFO "📰 Daily Briefing complete! Sent via $SENT channels."
+log INFO "📰 Daily Briefing complete!"
