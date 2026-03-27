@@ -307,26 +307,59 @@ get_configured_providers() {
 }
 
 # ═══════════════════════════════════════════════════════
-# AI Helper — call Groq API for any bot
+# AI Helper — auto-switches between free providers
 # ═══════════════════════════════════════════════════════
 ai_ask() {
   local prompt="$1"
-  local model="${2:-llama-3.1-8b-instant}"
-  local key="${GROQ_API_KEY:-}"
-  [ -z "$key" ] && return 1
-  RESPONSE=$(curl -s "https://api.groq.com/openai/v1/chat/completions" \
-    -H "Authorization: Bearer $key" \
-    -H "Content-Type: application/json" \
-    -d "{\"model\":\"$model\",\"messages\":[{\"role\":\"user\",\"content\":\"$prompt\"}],\"max_tokens\":2048}" 2>/dev/null)
-  echo "$RESPONSE" | jq -r '.choices[0].message.content // empty' 2>/dev/null
+  local model="${2:-}"
+  
+  # Try Groq first (fastest, 30 req/min free)
+  if [ -n "${GROQ_API_KEY:-}" ]; then
+    RESULT=$(curl -s "https://api.groq.com/openai/v1/chat/completions" \
+      -H "Authorization: Bearer $GROQ_API_KEY" \
+      -H "Content-Type: application/json" \
+      -d "{\"model\":\"${model:-llama-3.1-8b-instant}\",\"messages\":[{\"role\":\"user\",\"content\":\"$prompt\"}],\"max_tokens\":2048}" 2>/dev/null)
+    REPLY=$(echo "$RESULT" | jq -r '.choices[0].message.content // empty' 2>/dev/null)
+    [ -n "$REPLY" ] && echo "$REPLY" && return 0
+  fi
+  
+  # Fallback: OpenRouter (free tier, many models)
+  if [ -n "${OPENROUTER_API_KEY:-}" ]; then
+    RESULT=$(curl -s "https://openrouter.ai/api/v1/chat/completions" \
+      -H "Authorization: Bearer $OPENROUTER_API_KEY" \
+      -H "Content-Type: application/json" \
+      -d "{\"model\":\"${model:-meta-llama/llama-3.1-8b-instruct:free}\",\"messages\":[{\"role\":\"user\",\"content\":\"$prompt\"}],\"max_tokens\":2048}" 2>/dev/null)
+    REPLY=$(echo "$RESULT" | jq -r '.choices[0].message.content // empty' 2>/dev/null)
+    [ -n "$REPLY" ] && echo "$REPLY" && return 0
+  fi
+  
+  # Fallback: Mistral
+  if [ -n "${MISTRAL_API_KEY:-}" ]; then
+    RESULT=$(curl -s "https://api.mistral.ai/v1/chat/completions" \
+      -H "Authorization: Bearer $MISTRAL_API_KEY" \
+      -H "Content-Type: application/json" \
+      -d "{\"model\":\"${model:-mistral-small}\",\"messages\":[{\"role\":\"user\",\"content\":\"$prompt\"}],\"max_tokens\":2048}" 2>/dev/null)
+    REPLY=$(echo "$RESULT" | jq -r '.choices[0].message.content // empty' 2>/dev/null)
+    [ -n "$REPLY" ] && echo "$REPLY" && return 0
+  fi
+  
+  # Fallback: Together
+  if [ -n "${TOGETHER_API_KEY:-}" ]; then
+    RESULT=$(curl -s "https://api.together.xyz/v1/chat/completions" \
+      -H "Authorization: Bearer $TOGETHER_API_KEY" \
+      -H "Content-Type: application/json" \
+      -d "{\"model\":\"${model:-meta-llama/Llama-3-8b-chat-hf}\",\"messages\":[{\"role\":\"user\",\"content\":\"$prompt\"}],\"max_tokens\":2048}" 2>/dev/null)
+    REPLY=$(echo "$RESULT" | jq -r '.choices[0].message.content // empty' 2>/dev/null)
+    [ -n "$REPLY" ] && echo "$REPLY" && return 0
+  fi
+  
+  return 1
 }
 
 ai_code() {
-  local task="$1"
-  ai_ask "You are a senior full-stack developer. Generate complete, production-ready code for: $task. Output ONLY code, no explanations." "llama-3.3-70b-versatile"
+  ai_ask "You are a senior full-stack developer. Generate complete, production-ready code for: $1. Output ONLY code, no explanations." "llama-3.3-70b-versatile"
 }
 
 ai_review() {
-  local code="$1"
-  ai_ask "Review this code for bugs, security issues, and improvements. Be specific: $code" "llama-3.3-70b-versatile"
+  ai_ask "Review this code for bugs, security issues, and improvements. Be specific: $1" "llama-3.3-70b-versatile"
 }
