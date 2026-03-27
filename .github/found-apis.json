@@ -1,0 +1,390 @@
+{
+  "last_scan": "2026-03-27T12:29:47Z",
+  "apis": [
+    {
+      "name": "Replicate",
+      "url": "https://api.replicate.com/v1",
+      "description": "FREE credits, runs any model",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "AIMLAPI",
+      "url": "https://api.aimlapi.com/v1",
+      "description": "FREE tier, 200+ models",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "Clarifai",
+      "url": "https://api.clarifai.com/v2",
+      "description": "FREE tier, many AI models",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "Eden AI",
+      "url": "https://api.edenai.run/v2",
+      "description": "FREE tier, aggregates providers",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "AssemblyAI",
+      "url": "https://api.assemblyai.com/v2",
+      "description": "FREE tier for speech-to-text",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "Zephyr",
+      "url": "https://api.zephyr.cloud",
+      "description": "FREE inference",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "Deepgram",
+      "url": "https://api.deepgram.com/v1",
+      "description": "FREE tier for STT",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "Novita AI",
+      "url": "https://api.novita.ai/v3",
+      "description": "FREE tier, GPU inference",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "Mistral",
+      "url": "https://api.mistral.ai/v1",
+      "description": "FREE tier, Mistral models",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "Hugging Face",
+      "url": "https://api-inference.huggingface.co/models",
+      "description": "FREE inference API",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "ElevenLabs",
+      "url": "https://api.elevenlabs.io/v1",
+      "description": "FREE tier for TTS",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "Groq",
+      "url": "https://api.groq.com/v1",
+      "description": "FREE LLaMA/Mixtral models, very fast",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "Stability AI",
+      "url": "https://api.stability.ai/v1",
+      "description": "FREE credits for image gen",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "Perplexity",
+      "url": "https://api.perplexity.ai",
+      "description": "FREE tier with search",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "Cohere",
+      "url": "https://api.cohere.ai/v1",
+      "description": "FREE trial, good for embeddings",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "DeepInfra",
+      "url": "https://api.deepinfra.com/v1/openai",
+      "description": "FREE tier, many models",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "Anyscale",
+      "url": "https://api.endpoints.anyscale.com/v0",
+      "description": "FREE tier for Llama models",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "Fireworks AI",
+      "url": "https://api.fireworks.ai/inference/v1",
+      "description": "FREE credits on signup",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "OpenRouter",
+      "url": "https://openrouter.ai/api/v1",
+      "description": "FREE tier on many models",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "Together AI",
+      "url": "https://api.together.xyz/v1",
+      "description": "FREE tier, open source models",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "Movies-OMDB",
+      "url": "https://www.omdbapi.com",
+      "description": "FREE movie database (1000/day)",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "Calendar-Holiday",
+      "url": "https://date.nager.at/api/v3",
+      "description": "FREE public holidays",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "Jokes",
+      "url": "https://v2.jokeapi.dev",
+      "description": "FREE jokes API",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "Dictionary",
+      "url": "https://api.dictionaryapi.dev/api/v2/entries",
+      "description": "FREE dictionary",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "Pokemon",
+      "url": "https://pokeapi.co/api/v2",
+      "description": "FREE Pokemon data",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "GitHub-Users",
+      "url": "https://api.github.com",
+      "description": "FREE GitHub data",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "IP-Info",
+      "url": "https://ipapi.co/api",
+      "description": "FREE IP geolocation",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "Weather-OpenMeteo",
+      "url": "https://api.open-meteo.com/v1",
+      "description": "FREE weather, no key needed",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "RandomUser",
+      "url": "https://randomuser.me/api",
+      "description": "FREE random user data",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "Currency-ExchangeRate",
+      "url": "https://open.er-api.com/v6/latest",
+      "description": "FREE exchange rates",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "Quotes",
+      "url": "https://api.quotable.io",
+      "description": "FREE quotes",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "Anime-Jikan",
+      "url": "https://api.jikan.moe/v4",
+      "description": "FREE anime database",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "Music-LastFM",
+      "url": "https://ws.audioscrobbler.com/2.0",
+      "description": "FREE music data",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "News-NewsData",
+      "url": "https://newsdata.io/api/1",
+      "description": "FREE news API",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "Translate-Libre",
+      "url": "https://libretranslate.com",
+      "description": "FREE translation, no key",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "Countries",
+      "url": "https://restcountries.com/v3.1",
+      "description": "FREE country data",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "QR-GoQR",
+      "url": "https://goqr.me/api",
+      "description": "FREE QR code generation",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "Lorem-Ipsum",
+      "url": "https://loripsum.net/api",
+      "description": "FREE lorem ipsum",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "Books-OpenLibrary",
+      "url": "https://openlibrary.org/developers/api",
+      "description": "FREE book data",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "URL-Shortener",
+      "url": "https://cleanuri.com/api",
+      "description": "FREE URL shortener",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "Cloudflare-Workers",
+      "url": "https://workers.cloudflare.com",
+      "description": "FREE edge compute",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "NHost",
+      "url": "https://nhost.io",
+      "description": "FREE GraphQL backend",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "Neon",
+      "url": "https://neon.tech",
+      "description": "FREE serverless PostgreSQL",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "Vercel",
+      "url": "https://api.vercel.com",
+      "description": "FREE hosting, serverless functions",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "Render",
+      "url": "https://api.render.com",
+      "description": "FREE tier, web services",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "Netlify",
+      "url": "https://api.netlify.com",
+      "description": "FREE hosting, forms, functions",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "Upstash",
+      "url": "https://upstash.com",
+      "description": "FREE Redis + Kafka",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "Supabase",
+      "url": "https://supabase.com",
+      "description": "FREE PostgreSQL + Auth + Storage",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "PlanetScale",
+      "url": "https://api.planetscale.com",
+      "description": "FREE MySQL, serverless",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "Deta",
+      "url": "https://deta.space",
+      "description": "FREE cloud micro-services",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "Firebase",
+      "url": "https://firebase.google.com",
+      "description": "FREE tier, real-time DB",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "Railway",
+      "url": "https://railway.app",
+      "description": "FREE tier for backends",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "Fly.io",
+      "url": "https://fly.io",
+      "description": "FREE tier for containers",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "Turso",
+      "url": "https://turso.tech",
+      "description": "FREE edge SQLite",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    },
+    {
+      "name": "Appwrite",
+      "url": "https://appwrite.io",
+      "description": "FREE BaaS, open source",
+      "found": "2026-03-27T12:29:47Z",
+      "status": "active"
+    }
+  ]
+}
