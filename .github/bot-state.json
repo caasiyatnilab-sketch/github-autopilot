@@ -1,0 +1,15 @@
+{
+  "api_keys": {},
+  "active_projects": [],
+  "bot_health": {
+    "passing": 0,
+    "failing": 0,
+    "score": 0
+  },
+  "upgrades_needed": [],
+  "last_sync": "2026-03-27T14:14:42Z",
+  "auto_deploy": true,
+  "self_upgrade": true,
+  "upgrades_applied": 0,
+  "last_upgrade": "2026-03-27T14:14:42Z"
+}
