@@ -45,7 +45,7 @@ import express from 'express';
 class AIAgent {
   constructor() {
     this.providers = {
-      groq: { url: 'https://api.groq.com/openai/v1/chat/completions', key: process.env.GROQ_API_KEY, models: ['llama3-8b-8192', 'llama3-70b-8192', 'mixtral-8x7b-32768'] },
+      groq: { url: 'https://api.groq.com/openai/v1/chat/completions', key: process.env.GROQ_API_KEY, models: ['llama-3.1-8b-instant', 'llama-3.3-70b-versatile', 'llama-3.1-8b-instant'] },
       together: { url: 'https://api.together.xyz/v1/chat/completions', key: process.env.TOGETHER_API_KEY, models: ['meta-llama/Llama-3-8b-chat-hf', 'mistralai/Mixtral-8x7B-Instruct-v0.1'] },
       openrouter: { url: 'https://openrouter.ai/api/v1/chat/completions', key: process.env.OPENROUTER_API_KEY, models: ['meta-llama/llama-3-8b-instruct:free', 'mistralai/mistral-7b-instruct:free'] },
       mistral: { url: 'https://api.mistral.ai/v1/chat/completions', key: process.env.MISTRAL_API_KEY, models: ['mistral-tiny', 'mistral-small', 'mistral-medium'] },
@@ -206,7 +206,7 @@ Be specific with line references and provide fixes.`;
         method: 'POST',
         headers: { 'Authorization': `Bearer ${provider.key}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: name === 'groq' ? 'llama3-70b-8192' : 'meta-llama/llama-3-70b-instruct',
+          model: name === 'groq' ? 'llama-3.3-70b-versatile' : 'meta-llama/llama-3-70b-instruct',
           messages: [
             { role: 'system', content: systemPrompt },
             { role: 'user', content: `Review this code:\n\`\`\`${language}\n${code}\n\`\`\`` }
@@ -252,7 +252,7 @@ export async function analyzeData(data, question = null) {
     : `Analyze this data and provide key insights, trends, anomalies, and recommendations:\n\n${typeof data === 'string' ? data : JSON.stringify(data, null, 2)}`;
 
   const providers = [
-    { url: 'https://api.groq.com/openai/v1/chat/completions', key: process.env.GROQ_API_KEY, model: 'llama3-70b-8192' },
+    { url: 'https://api.groq.com/openai/v1/chat/completions', key: process.env.GROQ_API_KEY, model: 'llama-3.3-70b-versatile' },
     { url: 'https://openrouter.ai/api/v1/chat/completions', key: process.env.OPENROUTER_API_KEY, model: 'meta-llama/llama-3-70b-instruct' },
   ];
 
@@ -311,7 +311,7 @@ export async function writeContent(type, topic, tone = 'professional') {
   const prompt = prompts[type] || `Write ${type} content about: ${topic}`;
 
   const providers = [
-    { url: 'https://api.groq.com/openai/v1/chat/completions', key: process.env.GROQ_API_KEY, model: 'llama3-70b-8192' },
+    { url: 'https://api.groq.com/openai/v1/chat/completions', key: process.env.GROQ_API_KEY, model: 'llama-3.3-70b-versatile' },
     { url: 'https://openrouter.ai/api/v1/chat/completions', key: process.env.OPENROUTER_API_KEY, model: 'meta-llama/llama-3-70b-instruct' },
   ];
 

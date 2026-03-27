@@ -44,7 +44,7 @@ import express from 'express';
 class AIEngine {
   constructor() {
     this.providers = {
-      groq:      { url: 'https://api.groq.com/openai/v1/chat/completions', key: process.env.GROQ_API_KEY, models: ['llama3-70b-8192', 'llama3-8b-8192', 'mixtral-8x7b-32768'], speed: 'fastest' },
+      groq:      { url: 'https://api.groq.com/openai/v1/chat/completions', key: process.env.GROQ_API_KEY, models: ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant', 'llama-3.1-8b-instant'], speed: 'fastest' },
       together:  { url: 'https://api.together.xyz/v1/chat/completions', key: process.env.TOGETHER_API_KEY, models: ['meta-llama/Llama-3-70b-chat-hf', 'mistralai/Mixtral-8x7B-Instruct-v0.1'], speed: 'fast' },
       openrouter:{ url: 'https://openrouter.ai/api/v1/chat/completions', key: process.env.OPENROUTER_API_KEY, models: ['meta-llama/llama-3-70b-instruct', 'mistralai/mistral-7b-instruct:free'], speed: 'medium' },
       mistral:   { url: 'https://api.mistral.ai/v1/chat/completions', key: process.env.MISTRAL_API_KEY, models: ['mistral-large-latest', 'mistral-medium', 'mistral-small'], speed: 'fast' },
@@ -253,7 +253,7 @@ async function generate(systemPrompt, userPrompt) {
       const res = await fetch(p.url, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${p.key}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: 'llama3-70b-8192', messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }], max_tokens: 2048 }),
+        body: JSON.stringify({ model: 'llama-3.3-70b-versatile', messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }], max_tokens: 2048 }),
       });
       if (res.ok) { const data = await res.json(); return data.choices[0].message.content; }
     } catch (e) { continue; }
@@ -312,11 +312,11 @@ EOF
 import express from 'express';
 
 const AGENTS = {
-  coder: { name: 'Code Agent', system: 'You are an expert programmer. Write clean, efficient code.', model: 'llama3-70b-8192' },
-  writer: { name: 'Writer Agent', system: 'You are a professional writer. Create engaging content.', model: 'llama3-70b-8192' },
-  analyst: { name: 'Analyst Agent', system: 'You are a data analyst. Provide insights and analysis.', model: 'llama3-70b-8192' },
-  researcher: { name: 'Research Agent', system: 'You are a research assistant. Find and summarize information.', model: 'llama3-70b-8192' },
-  reviewer: { name: 'Code Reviewer', system: 'You review code for bugs, security issues, and best practices.', model: 'llama3-70b-8192' },
+  coder: { name: 'Code Agent', system: 'You are an expert programmer. Write clean, efficient code.', model: 'llama-3.3-70b-versatile' },
+  writer: { name: 'Writer Agent', system: 'You are a professional writer. Create engaging content.', model: 'llama-3.3-70b-versatile' },
+  analyst: { name: 'Analyst Agent', system: 'You are a data analyst. Provide insights and analysis.', model: 'llama-3.3-70b-versatile' },
+  researcher: { name: 'Research Agent', system: 'You are a research assistant. Find and summarize information.', model: 'llama-3.3-70b-versatile' },
+  reviewer: { name: 'Code Reviewer', system: 'You review code for bugs, security issues, and best practices.', model: 'llama-3.3-70b-versatile' },
 };
 
 async function callAI(system, message, model) {
@@ -392,7 +392,7 @@ import express from 'express';
 import { readFileSync } from 'fs';
 
 const PROVIDERS = {
-  groq: { url: 'https://api.groq.com/openai/v1/chat/completions', key: process.env.GROQ_API_KEY, models: ['llama3-70b-8192', 'llama3-8b-8192', 'mixtral-8x7b-32768'] },
+  groq: { url: 'https://api.groq.com/openai/v1/chat/completions', key: process.env.GROQ_API_KEY, models: ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant', 'llama-3.1-8b-instant'] },
   openrouter: { url: 'https://openrouter.ai/api/v1/chat/completions', key: process.env.OPENROUTER_API_KEY, models: ['meta-llama/llama-3-70b-instruct', 'mistralai/mistral-7b-instruct:free'] },
   mistral: { url: 'https://api.mistral.ai/v1/chat/completions', key: process.env.MISTRAL_API_KEY, models: ['mistral-large-latest', 'mistral-small'] },
 };

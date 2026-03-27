@@ -292,7 +292,7 @@ const PROVIDERS = {
 };
 
 app.post('/chat', async (req, res) => {
-  const { message, provider = 'groq', model = 'llama3-8b-8192' } = req.body;
+  const { message, provider = 'groq', model = 'llama-3.1-8b-instant' } = req.body;
   const p = PROVIDERS[provider];
   if (!p || !p.key) return res.status(400).json({ error: 'Provider not configured' });
 

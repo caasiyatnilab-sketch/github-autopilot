@@ -44,7 +44,7 @@ ask_ai() {
   local prompt="$1"
   [ -z "$AI_KEY" ] && return 1
   
-  local model="llama3-8b-8192"
+  local model="llama-3.1-8b-instant"
   [ "$AI_PROVIDER" = "OpenRouter" ] && model="meta-llama/llama-3-8b-instruct:free"
   [ "$AI_PROVIDER" = "Mistral" ] && model="mistral-small"
   [ "$AI_PROVIDER" = "Together" ] && model="meta-llama/Llama-3-8b-chat-hf"
