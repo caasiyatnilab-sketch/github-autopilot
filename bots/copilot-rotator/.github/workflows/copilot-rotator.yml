@@ -1,16 +1,19 @@
 name: 🔑 Copilot Rotator
-on: { schedule: [{ cron: '0 */12 * * *' }], workflow_dispatch: {} }
-permissions: { contents: write }
+on:
+  schedule:
+    - cron: '0 */12 * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
 jobs:
   rotate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: source shared/utils.sh && bash bots/copilot-rotator/scripts/copilot-rotator.sh
+      - name: 🔑 Run
         env:
-          GH_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
-          REPO: '${{ github.repository }}'
-          GROQ_API_KEY: '${{ secrets.GROQ_API_KEY || '' }}'
-          OPENAI_API_KEY: '${{ secrets.OPENAI_API_KEY || '' }}'
-          OPENROUTER_API_KEY: '${{ secrets.OPENROUTER_API_KEY || '' }}'
-          MISTRAL_API_KEY: '${{ secrets.MISTRAL_API_KEY || '' }}'
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          source shared/utils.sh
+          bash bots/copilot-rotator/scripts/copilot-rotator.sh
