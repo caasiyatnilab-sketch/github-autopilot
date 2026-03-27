@@ -1,0 +1,22 @@
+name: 🏭 Creator Bot
+on:
+  schedule: [{ cron: '0 6 * * 1' }]
+  workflow_dispatch:
+permissions: { contents: write, pages: write, id-token: write }
+jobs:
+  create:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: source shared/utils.sh && bash bots/creator-bot/scripts/creator-bot.sh
+        env: { GH_TOKEN: '${{ secrets.GITHUB_TOKEN }}', REPO: '${{ github.repository }}' }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: creator-report, path: creator-report.md }
+      - name: 💾 Commit creations
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add creations/ 2>/dev/null
+          git diff --cached --quiet || git commit -m "🏭 Creator Bot: New projects generated [skip ci]"
+          git push || true
