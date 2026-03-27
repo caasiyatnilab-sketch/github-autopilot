@@ -1,0 +1,25 @@
+name: 🌐 API Hunter
+on:
+  schedule: [{ cron: '0 */6 * * *' }]
+  workflow_dispatch:
+permissions: { contents: write, issues: write }
+jobs:
+  hunt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: 🌐 Run
+        env: { GH_TOKEN: '${{ secrets.GITHUB_TOKEN }}', REPO: '${{ github.repository }}', DISCORD_WEBHOOK: '${{ secrets.DISCORD_WEBHOOK || '' }}' }
+        run: |
+          source shared/utils.sh
+          bash bots/api-hunter/scripts/api-hunter.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: api-hunter-report, path: api-hunter-report.md }
+      - name: 💾 Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .github/found-apis.json 2>/dev/null
+          git diff --cached --quiet || git commit -m "🌐 API Hunter: Update database [skip ci]"
+          git push || true

@@ -1,0 +1,40 @@
+name: 🎯 Autopilot (Master Controller)
+on:
+  schedule:
+    - cron: '0 */4 * * *'  # Every 4 hours
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+  actions: read
+  pull-requests: write
+  security-events: write
+
+jobs:
+  autopilot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup
+        run: |
+          npm ci 2>/dev/null || npm install 2>/dev/null || true
+
+      - name: 🎯 Run Autopilot
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK || '' }}
+        run: |
+          source shared/utils.sh
+          chmod +x bots/autopilot/scripts/autopilot.sh
+          bash bots/autopilot/scripts/autopilot.sh
+
+      - name: 📊 Upload Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: autopilot-${{ github.run_number }}
+          path: autopilot-report.md

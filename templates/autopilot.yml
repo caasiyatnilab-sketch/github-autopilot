@@ -1,0 +1,56 @@
+# GitHub Autopilot Configuration
+# Place in .github/autopilot.yml to customize behavior
+
+autopilot:
+  enabled: true
+  log_level: info
+  notify_discord: false
+
+api_hunter:
+  enabled: true
+  categories:
+    - ai_models
+    - text_generation
+    - image_generation
+    - translation
+    - speech
+    - code_assist
+    - tools
+    - deploy
+  save_to: ".github/found-apis.json"
+
+repo_builder:
+  enabled: true
+  templates_dir: ".github/project-templates/"
+  auto_create: false
+
+scraper_bot:
+  enabled: true
+  targets: []
+
+deploy_bot:
+  enabled: true
+  providers:
+    - vercel
+    - netlify
+    - github_pages
+    - railway
+
+copilot_rotator:
+  enabled: true
+  providers:
+    - groq
+    - together
+    - openrouter
+    - mistral
+    - deepinfra
+  min_free_tier: true
+
+ai_agent_factory:
+  enabled: true
+  templates:
+    - chatbot
+    - code_reviewer
+    - data_analyst
+    - content_writer
+  deploy_to: local

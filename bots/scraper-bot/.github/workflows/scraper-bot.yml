@@ -1,0 +1,10 @@
+name: 🕷️ Scraper Bot
+on: { schedule: [{ cron: '0 4 * * *' }], workflow_dispatch: {} }
+permissions: { contents: write }
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: source shared/utils.sh && bash bots/scraper-bot/scripts/scraper-bot.sh
+        env: { GH_TOKEN: '${{ secrets.GITHUB_TOKEN }}', REPO: '${{ github.repository }}' }
