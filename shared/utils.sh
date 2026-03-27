@@ -353,6 +353,16 @@ ai_ask() {
     [ -n "$REPLY" ] && echo "$REPLY" && return 0
   fi
   
+  # Fallback: HuggingFace (free, router API)
+  if [ -n "${HF_TOKEN:-}" ]; then
+    RESULT=$(curl -s "https://router.huggingface.co/v1/chat/completions" \
+      -H "Authorization: Bearer $HF_TOKEN" \
+      -H "Content-Type: application/json" \
+      -d "{\"model\":\"meta-llama/Llama-3.1-8B-Instruct\",\"messages\":[{\"role\":\"user\",\"content\":\"$prompt\"}],\"max_tokens\":2048}" 2>/dev/null)
+    REPLY=$(echo "$RESULT" | jq -r '.choices[0].message.content // empty' 2>/dev/null)
+    [ -n "$REPLY" ] && echo "$REPLY" && return 0
+  fi
+  
   return 1
 }
 
