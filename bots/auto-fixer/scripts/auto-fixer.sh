@@ -8,6 +8,14 @@ log INFO "🛠️ Auto Fixer starting..."
 CHANGES=false
 FIXES=""
 
+# AI-powered code analysis
+AI_TIPS=""
+if [ -n "${GROQ_API_KEY:-}" ] || [ -n "${OPENROUTER_API_KEY:-}" ]; then
+  log INFO "  🤖 AI mode — smart code analysis..."
+  AI_TIPS=$(ai_ask "List 3 common bugs in JavaScript/Node.js projects and one-line fixes for each. Be brief." 2>/dev/null || echo "")
+  [ -n "$AI_TIPS" ] && log INFO "  ✅ AI fix tips received"
+fi
+
 # 1. ESLint fix
 if [ -f "package.json" ]; then
   if grep -q '"eslint"' package.json 2>/dev/null || [ -f ".eslintrc.js" ] || [ -f ".eslintrc.json" ]; then

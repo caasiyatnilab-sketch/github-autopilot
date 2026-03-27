@@ -9,6 +9,15 @@ REPORT="daily-briefing-report.md"
 
 log INFO "📰 Daily Briefing Bot starting..."
 
+# AI-powered insights
+AI_INSIGHT=""
+if [ -n "${GROQ_API_KEY:-}" ] || [ -n "${OPENROUTER_API_KEY:-}" ]; then
+  log INFO "  🤖 AI mode — generating insights..."
+  AI_INSIGHT=$(ai_ask "Give one brief productivity tip for a developer. Be concise." 2>/dev/null || echo "")
+fi
+
+log INFO "📰 Daily Briefing Bot starting..."
+
 REPO=$(get_repo)
 TODAY=$(date -u '+%Y-%m-%d')
 YESTERDAY=$(days_ago 1)

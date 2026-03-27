@@ -5,6 +5,14 @@ BOT="health-checker"; REPORT="health-checker-report.md"
 log INFO "🔍 Health Checker starting..."
 SCORE=100; ISSUES=()
 
+# AI-powered health analysis
+AI_INSIGHT=""
+if [ -n "${GROQ_API_KEY:-}" ] || [ -n "${OPENROUTER_API_KEY:-}" ]; then
+  log INFO "  🤖 AI mode — analyzing repo..."
+  AI_INSIGHT=$(ai_ask "Analyze a GitHub repo called $(get_repo). List 3 specific things to improve for better health score. Be brief." 2>/dev/null || echo "")
+  [ -n "$AI_INSIGHT" ] && log INFO "  ✅ AI analysis received"
+fi
+
 for branch in main master; do
   PROTECTED=$(gh api "repos/$(get_repo)/branches/$branch" --jq '.protected' 2>/dev/null || echo "skip")
   [ "$PROTECTED" = "true" ] && continue
