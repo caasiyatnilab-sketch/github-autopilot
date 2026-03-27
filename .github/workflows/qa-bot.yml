@@ -1,0 +1,15 @@
+name: ✅ QA/QC Bot
+on:
+  push: { branches: [main, master] }
+  workflow_dispatch:
+permissions: { contents: read, issues: write }
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: source shared/utils.sh && bash bots/qa-bot/scripts/qa-bot.sh
+        env: { GH_TOKEN: '${{ secrets.GITHUB_TOKEN }}', REPO: '${{ github.repository }}' }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: qa-report, path: qa-bot-report.md }
