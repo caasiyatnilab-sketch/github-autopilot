@@ -307,6 +307,12 @@ get_configured_providers() {
 }
 
 # ═══════════════════════════════════════════════════════
+# AI Engine v3 — Load specialized AI functions
+# ═══════════════════════════════════════════════════════
+SCRIPT_DIR="${GITHUB_WORKSPACE:-.}"
+[ -f "$SCRIPT_DIR/shared/ai-engine.sh" ] && source "$SCRIPT_DIR/shared/ai-engine.sh"
+
+# ═══════════════════════════════════════════════════════
 # AI Helper — auto-switches between free providers
 # ═══════════════════════════════════════════════════════
 ai_ask() {

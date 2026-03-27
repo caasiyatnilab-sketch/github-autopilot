@@ -13,7 +13,7 @@ log INFO "📰 Daily Briefing Bot starting..."
 AI_INSIGHT=""
 if [ -n "${GROQ_API_KEY:-}" ] || [ -n "${OPENROUTER_API_KEY:-}" ]; then
   log INFO "  🤖 AI mode — generating insights..."
-  AI_INSIGHT=$(ai_ask "Give one brief productivity tip for a developer. Be concise." 2>/dev/null || echo "")
+  AI_INSIGHT=$(ai_smart "Give one brief productivity tip for a developer. Be concise." 2>/dev/null || echo "")
 fi
 
 log INFO "📰 Daily Briefing Bot starting..."

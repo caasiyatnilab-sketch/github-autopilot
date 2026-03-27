@@ -10,7 +10,7 @@ log INFO "🕷️ Scraper Bot starting..."
 AI_TRENDS=""
 if [ -n "${GROQ_API_KEY:-}" ] || [ -n "${OPENROUTER_API_KEY:-}" ]; then
   log INFO "  🤖 AI mode — analyzing trends..."
-  AI_TRENDS=$(ai_ask "What are the top 3 trending tech topics for developers right now? Brief answer." 2>/dev/null || echo "")
+  AI_TRENDS=$(ai_smart "What are the top 3 trending tech topics for developers right now? Brief answer." 2>/dev/null || echo "")
   [ -n "$AI_TRENDS" ] && log INFO "  ✅ AI trend analysis received"
 fi
 

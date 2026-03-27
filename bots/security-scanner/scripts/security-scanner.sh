@@ -5,13 +5,8 @@ BOT="security-scanner"; REPORT="security-scanner-report.md"
 log INFO "🔒 Security Scanner starting..."
 VULNS=0; CRIT=0; HIGH=0; MOD=0; SECRETS_FOUND=0
 
-# AI-powered security analysis
-AI_SECURITY=""
-if [ -n "${GROQ_API_KEY:-}" ] || [ -n "${OPENROUTER_API_KEY:-}" ]; then
-  log INFO "  🤖 AI mode — smart security analysis..."
-  AI_SECURITY=$(ai_ask "List 5 critical security vulnerabilities to check in a web project. Be specific and brief." 2>/dev/null || echo "")
-  [ -n "$AI_SECURITY" ] && log INFO "  ✅ AI security tips received"
-fi
+# AI-powered deep security audit
+AI_SECURITY=$(ai_review_security "Check a web project for: exposed secrets, vulnerable dependencies, insecure configurations, XSS, CSRF, injection attacks. List specific risks." 2>/dev/null || echo "")
 
 if [ -f "package.json" ]; then
   AUDIT=$(npm audit --json 2>/dev/null || echo '{"metadata":{"vulnerabilities":{"critical":0,"high":0,"moderate":0}}}')
