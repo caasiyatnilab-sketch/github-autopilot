@@ -1,0 +1,21 @@
+name: 🛠️ Auto Fixer
+on:
+  push: { branches: [main, master] }
+  workflow_dispatch:
+permissions: { contents: write, pull-requests: write }
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - name: 🛠️ Run
+        env: { GH_TOKEN: '${{ secrets.GITHUB_TOKEN }}', REPO: '${{ github.repository }}' }
+        run: |
+          npm ci 2>/dev/null || true
+          source shared/utils.sh
+          bash bots/auto-fixer/scripts/auto-fixer.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: fix-report, path: auto-fixer-report.md }

@@ -1,0 +1,19 @@
+name: 📊 Weekly Reporter
+on:
+  schedule: [{ cron: '0 17 * * 5' }]
+  workflow_dispatch:
+permissions: { contents: read, issues: write }
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: 📊 Run
+        env: { GH_TOKEN: '${{ secrets.GITHUB_TOKEN }}', REPO: '${{ github.repository }}' }
+        run: |
+          source shared/utils.sh
+          bash bots/weekly-reporter/scripts/weekly-reporter.sh
+      - name: 📋 Issue
+        env: { GH_TOKEN: '${{ secrets.GITHUB_TOKEN }}' }
+        run: gh issue create --title "📊 Weekly Report — $(date +%Y-%m-%d)" --body "$(cat weekly-reporter-report.md)" --label "documentation,automated"

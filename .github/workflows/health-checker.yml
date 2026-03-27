@@ -1,0 +1,42 @@
+name: 🔍 Health Checker
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  actions: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 🔍 Run Health Check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          npm ci 2>/dev/null || true
+          source shared/utils.sh
+          bash bots/health-checker/scripts/health-checker.sh
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: health-report-${{ github.run_number }}
+          path: health-checker-report.md
+
+      - name: 🚨 Create Issue on Failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue create \
+            --title "🚨 Health Check Failed — $(date +%Y-%m-%d)" \
+            --body "$(cat health-checker-report.md)" \
+            --label "bug,automated" \
+            --assignee "${{ github.repository_owner }}"

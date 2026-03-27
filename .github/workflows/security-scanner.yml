@@ -1,0 +1,20 @@
+name: 🔒 Security Scanner
+on:
+  schedule: [{ cron: '0 2 * * *' }]
+  push: { branches: [main, master] }
+  workflow_dispatch:
+permissions: { contents: read, security-events: write, issues: write }
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: 🔒 Run
+        env: { GH_TOKEN: '${{ secrets.GITHUB_TOKEN }}', REPO: '${{ github.repository }}' }
+        run: |
+          npm ci 2>/dev/null || true
+          source shared/utils.sh
+          bash bots/security-scanner/scripts/security-scanner.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: security-report, path: security-scanner-report.md }

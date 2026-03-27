@@ -1,0 +1,16 @@
+name: 🏷️ Issue & PR Manager
+on:
+  issues: { types: [opened] }
+  schedule: [{ cron: '0 0 * * *' }]
+  workflow_dispatch:
+permissions: { issues: write, pull-requests: write, contents: read }
+jobs:
+  manage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: 🏷️ Run
+        env: { GH_TOKEN: '${{ secrets.GITHUB_TOKEN }}', REPO: '${{ github.repository }}' }
+        run: |
+          source shared/utils.sh
+          bash bots/issue-pr-manager/scripts/issue-pr-manager.sh all
