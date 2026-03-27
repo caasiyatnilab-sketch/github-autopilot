@@ -30,3 +30,5 @@ $ACTIONS'''
 open('$REPORT', 'w').write(lines)
 "
 cat "$REPORT"
+
+notify "$(basename $BOT_NAME 2>/dev/null || basename $0)" "Bot completed successfully. Check report." 2>/dev/null || true

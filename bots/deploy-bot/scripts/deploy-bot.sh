@@ -30,6 +30,8 @@ if [ "$PROJECT_TYPE" = "unknown" ]; then
 _Automated by Deploy Bot 🚀_
 REOF
   cat "$REPORT"
+
+notify "$(basename $BOT_NAME 2>/dev/null || basename $0)" "Bot completed successfully. Check report." 2>/dev/null || true
   log INFO "🚀 Deploy Bot complete (nothing to deploy)"
   exit 0
 fi
@@ -74,5 +76,7 @@ _Automated by Deploy Bot 🚀_
 REOF
 
 cat "$REPORT"
+
+notify "$(basename $BOT_NAME 2>/dev/null || basename $0)" "Bot completed successfully. Check report." 2>/dev/null || true
 log INFO "🚀 Deploy Bot complete!"
 exit 0

@@ -296,3 +296,5 @@ generate_report
 
 log INFO "🌐 API Hunter complete! Found ${#NEW_APIS[@]} new APIs."
 notify "🌐 API Hunter" "Found ${#NEW_APIS[@]} new free APIs. See report for details."
+
+exit 0

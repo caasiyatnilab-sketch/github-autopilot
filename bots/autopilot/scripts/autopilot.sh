@@ -152,4 +152,6 @@ echo "" >> "$REPORT"
 echo "_Automated by Autopilot 🎯_" >> "$REPORT"
 
 cat "$REPORT"
+
+notify "$(basename $BOT_NAME 2>/dev/null || basename $0)" "Bot completed successfully. Check report." 2>/dev/null || true
 log INFO "🎯 Autopilot complete! $BOTS_HEALTHY/$BOTS_TOTAL bots healthy."

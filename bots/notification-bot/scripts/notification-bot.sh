@@ -187,4 +187,8 @@ _Automated by Notification Bot 📬_
 EOF
 
 cat "$REPORT"
+
+notify "$(basename $BOT_NAME 2>/dev/null || basename $0)" "Bot completed successfully. Check report." 2>/dev/null || true
 log INFO "📬 Notification Bot complete! $NOTIFIED notifications sent."
+
+exit 0
