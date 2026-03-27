@@ -1,34 +1,90 @@
 #!/bin/bash
-set -euo pipefail
+# 📦 Auto Updater (Enhanced)
+# Checks, updates, fixes dependencies — auto-PR with changes
+set -uo pipefail
 source "${GITHUB_WORKSPACE:-.}/shared/utils.sh"
-BOT="auto-updater"; REPORT="auto-updater-report.md"
+
+REPORT="auto-updater-report.md"
 log INFO "📦 Auto Updater starting..."
 
-if [ ! -f "package.json" ]; then echo "No package.json found."; exit 0; fi
+REPO=$(get_repo)
+UPDATED=0
+FIXES=""
 
-OUTDATED=$(npm outdated --json 2>/dev/null || echo "{}")
-COUNT=$(echo "$OUTDATED" | jq 'length' 2>/dev/null || echo "0")
-
-ACTIONS="No updates needed"
-if [ "$COUNT" -gt 0 ]; then
-  npm update 2>/dev/null || true
-  npm audit fix 2>/dev/null || true
-  ACTIONS="- npm update applied\n- npm audit fix applied"
+if [ ! -f "package.json" ]; then
+  cat > "$REPORT" << 'REOF'
+# 📦 Auto Update Report
+ℹ️ No package.json found. Nothing to update.
+---
+_Automated by Auto Updater 📦_
+REOF
+  cat "$REPORT"
+  exit 0
 fi
 
-PKG_LIST=$(echo "$OUTDATED" | jq -r 'to_entries[] | "- \(.key): \(.value.current) → \(.value.latest)"' 2>/dev/null || echo "All up to date ✅")
+# 1. Check outdated packages
+log INFO "Checking outdated packages..."
+OUTDATED=$(npm outdated --json 2>/dev/null || echo "{}")
+COUNT=$(echo "$OUTDATED" | jq 'length' 2>/dev/null || echo "0")
+log INFO "  Found $COUNT outdated packages"
 
-python3 -c "
-lines = '''# 📦 Auto Update Report
-**Repo:** $(get_repo) | **Date:** $(date -u '+%Y-%m-%d %H:%M UTC')
+# 2. Update packages
+if [ "$COUNT" -gt 0 ]; then
+  log INFO "Running npm update..."
+  npm update 2>/dev/null && UPDATED=1 && FIXES="${FIXES}npm-update " || true
+fi
+
+# 3. Security audit fix
+log INFO "Running security audit..."
+AUDIT=$(npm audit --json 2>/dev/null || echo '{"metadata":{"vulnerabilities":{"critical":0,"high":0}}}')
+CRIT=$(echo "$AUDIT" | jq '.metadata.vulnerabilities.critical // 0' 2>/dev/null || echo "0")
+HIGH=$(echo "$AUDIT" | jq '.metadata.vulnerabilities.high // 0' 2>/dev/null || echo "0")
+
+if [ "$CRIT" -gt 0 ] || [ "$HIGH" -gt 0 ]; then
+  log INFO "Fixing vulnerabilities..."
+  npm audit fix 2>/dev/null && UPDATED=1 && FIXES="${FIXES}audit-fix " || true
+  # Force fix if needed
+  [ "$CRIT" -gt 0 ] && npm audit fix --force 2>/dev/null && FIXES="${FIXES}force-fix " || true
+fi
+
+# 4. Update package-lock
+if [ -f "package-lock.json" ]; then
+  npm install --package-lock-only 2>/dev/null || true
+fi
+
+# 5. Check for deprecated packages
+DEPRECATED=$(npm ls 2>&1 | grep -c "deprecated" || echo "0")
+log INFO "  Deprecated packages: $DEPRECATED"
+
+# 6. Generate outdated table
+OUTDATED_TABLE=$(echo "$OUTDATED" | jq -r 'to_entries[] | "| \(.key) | \(.value.current) | \(.value.wanted) | \(.value.latest) |"' 2>/dev/null || echo "| All up to date ✅ | - | - | - |")
+
+# Generate report
+cat > "$REPORT" << REOF
+# 📦 Auto Update Report
+**Date:** $(date -u '+%Y-%m-%d %H:%M UTC')
+**Repo:** $REPO
 
 ## Outdated Packages: $COUNT
-$PKG_LIST
+| Package | Current | Wanted | Latest |
+|---------|---------|--------|--------|
+$OUTDATED_TABLE
 
-## Actions Taken
-$ACTIONS'''
-open('$REPORT', 'w').write(lines)
-"
+## Security Audit
+- Critical: $CRIT
+- High: $HIGH
+- Deprecated: $DEPRECATED
+
+## Fixes Applied
+${FIXES:-None needed ✅}
+
+## Status
+$(if [ "$UPDATED" -eq 1 ]; then echo "✅ Updates applied. Auto-PR will be created."; else echo "✅ Everything up to date."; fi)
+
+---
+_Automated by Auto Updater 📦_
+REOF
+
 cat "$REPORT"
-
-notify "$(basename $BOT_NAME 2>/dev/null || basename $0)" "Bot completed successfully. Check report." 2>/dev/null || true
+notify "Auto Updater" "Checked $COUNT packages. Fixes: ${FIXES:-none}"
+exit 0
