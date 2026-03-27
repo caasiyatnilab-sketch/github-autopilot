@@ -1,0 +1,157 @@
+{
+  "apis": [
+    {
+      "name": "LibreTranslate",
+      "url": "https://libretranslate.com/languages",
+      "desc": "Free translation, no key",
+      "category": "ai",
+      "status": "live",
+      "signup": "none"
+    },
+    {
+      "name": "OpenMeteo",
+      "url": "https://api.open-meteo.com/v1/forecast?latitude=0&longitude=0&current_weather=true",
+      "desc": "Free weather, no key",
+      "category": "weather",
+      "status": "live",
+      "signup": "none"
+    },
+    {
+      "name": "wttr.in",
+      "url": "https://wttr.in/?format=j1",
+      "desc": "Weather in JSON, no key",
+      "category": "weather",
+      "status": "live",
+      "signup": "none"
+    },
+    {
+      "name": "RESTCountries",
+      "url": "https://restcountries.com/v3.1/all?fields=name",
+      "desc": "Country data, no key",
+      "category": "data",
+      "status": "live",
+      "signup": "none"
+    },
+    {
+      "name": "OpenLibrary",
+      "url": "https://openlibrary.org/api/books?bibkeys=ISBN:0451526538&format=json",
+      "desc": "Book data, no key",
+      "category": "data",
+      "status": "live",
+      "signup": "none"
+    },
+    {
+      "name": "PokeAPI",
+      "url": "https://pokeapi.co/api/v2/pokemon/1",
+      "desc": "Pokemon data, no key",
+      "category": "data",
+      "status": "live",
+      "signup": "none"
+    },
+    {
+      "name": "Jikan",
+      "url": "https://api.jikan.moe/v4/anime/1",
+      "desc": "Anime data, no key",
+      "category": "data",
+      "status": "live",
+      "signup": "none"
+    },
+    {
+      "name": "Dictionary",
+      "url": "https://api.dictionaryapi.dev/api/v2/entries/en/hello",
+      "desc": "Dictionary, no key",
+      "category": "data",
+      "status": "live",
+      "signup": "none"
+    },
+    {
+      "name": "ExchangeRate",
+      "url": "https://open.er-api.com/v6/latest/USD",
+      "desc": "Currency rates, no key",
+      "category": "finance",
+      "status": "live",
+      "signup": "none"
+    },
+    {
+      "name": "IP-Geolocation",
+      "url": "https://ipapi.co/json/",
+      "desc": "IP info, no key",
+      "category": "tools",
+      "status": "live",
+      "signup": "none"
+    },
+    {
+      "name": "HN-API",
+      "url": "https://hacker-news.firebaseio.com/v0/topstories.json",
+      "desc": "Hacker News, no key",
+      "category": "news",
+      "status": "live",
+      "signup": "none"
+    },
+    {
+      "name": "DevTo",
+      "url": "https://dev.to/api/articles?top=7",
+      "desc": "Dev.to articles, no key",
+      "category": "news",
+      "status": "live",
+      "signup": "none"
+    },
+    {
+      "name": "GitHub-Trending",
+      "url": "https://api.github.com/search/repositories?q=stars:>10000&sort=stars",
+      "desc": "Trending repos, no key",
+      "category": "github",
+      "status": "live",
+      "signup": "none"
+    },
+    {
+      "name": "GitHub-Users",
+      "url": "https://api.github.com/users/github",
+      "desc": "User data, no key",
+      "category": "github",
+      "status": "live",
+      "signup": "none"
+    },
+    {
+      "name": "RandomUser",
+      "url": "https://randomuser.me/api/",
+      "desc": "Random user data, no key",
+      "category": "tools",
+      "status": "live",
+      "signup": "none"
+    },
+    {
+      "name": "Jokes",
+      "url": "https://v2.jokeapi.dev/joke/Any",
+      "desc": "Jokes API, no key",
+      "category": "fun",
+      "status": "live",
+      "signup": "none"
+    },
+    {
+      "name": "Lyrics-OVH",
+      "url": "https://api.lyrics.ovh/v1/coldplay/yellow",
+      "desc": "Lyrics, no key",
+      "category": "music",
+      "status": "live",
+      "signup": "none"
+    },
+    {
+      "name": "Cat-Facts",
+      "url": "https://catfact.ninja/fact",
+      "desc": "Cat facts, no key",
+      "category": "fun",
+      "status": "live",
+      "signup": "none"
+    },
+    {
+      "name": "Dog-Facts",
+      "url": "https://dogapi.dog/api/v2/facts",
+      "desc": "Dog facts, no key",
+      "category": "fun",
+      "status": "live",
+      "signup": "none"
+    }
+  ],
+  "last_scan": "2026-03-27T18:56:38Z"
+}

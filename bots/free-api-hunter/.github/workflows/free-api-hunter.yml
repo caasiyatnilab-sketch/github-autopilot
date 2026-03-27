@@ -1,0 +1,22 @@
+name: 🆓 Free API Hunter
+on:
+  schedule: [{ cron: '0 */4 * * *' }]
+  workflow_dispatch:
+permissions: { contents: write }
+jobs:
+  hunt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: source shared/utils.sh && bash bots/free-api-hunter/scripts/free-api-hunter.sh
+        env: { GH_TOKEN: '${{ secrets.GITHUB_TOKEN }}', REPO: '${{ github.repository }}' }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: free-api-report, path: free-api-report.md }
+      - name: 💾 Save API database
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .github/free-apis.json 2>/dev/null
+          git diff --cached --quiet || git commit -m "🆓 Free API database updated [skip ci]"
+          git push || true
