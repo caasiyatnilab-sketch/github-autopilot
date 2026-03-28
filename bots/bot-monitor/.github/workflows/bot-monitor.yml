@@ -1,0 +1,43 @@
+name: 🤖 Bot Monitor
+on:
+  schedule:
+    - cron: '0 */3 * * *'  # Every 3 hours
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  actions: read
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 🤖 Run Bot Monitor
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        run: |
+          npm ci 2>/dev/null || true
+          source shared/utils.sh
+          bash bots/bot-monitor/scripts/bot-monitor.sh
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bot-monitor-report-${{ github.run_number }}
+          path: bot-monitor-report.md
+
+      - name: 🚨 Create Issue on Degradation
+        if: failure() || env.BOT_DEGRADATION == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue create \
+            --title "📉 Bot Performance Degradation Detected" \
+            --body "$(cat bot-monitor-report.md)" \
+            --label "bug,automated,performance" \
+            --assignee "${{ github.repository_owner }}"
