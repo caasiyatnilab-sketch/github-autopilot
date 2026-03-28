@@ -1,149 +1,174 @@
 #!/bin/bash
-# 🆓 Free API Hunter — Finds APIs that need NO signup/login
-# Auto-discovers, tests, and catalogs free APIs
-set -uo pipefail
+set -euo pipefail
 source "${GITHUB_WORKSPACE:-.}/shared/utils.sh"
+BOT="free-api-hunter"; REPORT="free-api-report.md"
+log INFO "🔍 Free API Hunter starting..."
 
-REPORT="free-api-report.md"
-log INFO "🆓 Free API Hunter starting..."
+# Directory for API data
+API_DIR="${GITHUB_WORKSPACE:-.}/.github"
+API_FILE="${API_DIR}/free-apis.json"
+FREEMIUM_FILE="${API_DIR}/freemium-apis.json"
+PAID_FILE="${API_DIR}/paid-apis.json"
+CATEGORIZED_FILE="${API_DIR}/apis-categorized.json"
 
-API_DB=".github/free-apis.json"
-mkdir -p .github
+# Ensure API directory exists
+mkdir -p "${API_DIR}"
 
-if [ ! -f "$API_DB" ]; then
-  echo '{"apis":[],"last_scan":"never"}' > "$API_DB"
-fi
+# Initialize output files if they don't exist
+for f in "${API_FILE}" "${FREEMIUM_FILE}" "${PAID_FILE}" "${CATEGORIZED_FILE}"; do
+  if [ ! -f "$f" ]; then
+    echo '[]' > "$f"
+  fi
+done
 
-FOUND=0
+# List of known free API sources to check (expand as needed)
+# In a real implementation, this would scrape websites, documentation, etc.
+# For this example, we'll simulate by testing a few known APIs
+declare -A TEST_APIS=(
+  ["Open-Meteo"]="https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current=temperature_2m,wind_speed_10m&hourly=temperature_2m,relativehumidity_2m,windspeed_10m"
+  ["REST Countries"]="https://restcountries.com/v3.1/name/united%20states"
+  ["Jikan"]="https://api.jikan.moe/v4/anime/1"
+  ["Awesome API"]="https://api.awesomeapi.com.br/json/last/USD-BRL"
+  ["ExchangeRate.API"]="https://api.exchangerate-api.com/v4/latest/USD"
+  ["Frankfurter"]="https://api.frankfurter.dev/v1/latest?base=USD"
+  ["Date.nager.at"]="https://date.nager.at/api/v3/PublicHolidays/2024/US"
+  ["Open Library"]="https://openlibrary.org/search.json?title=the+lord+of+the+rings"
+  ["IPinfo.io"]="https://ipinfo.io/json"
+  # Add more test APIs as needed
+)
 
-# ═══════════════════════════════════════════════════════
-# Free APIs — NO signup, NO login, NO API key needed
-# ═══════════════════════════════════════════════════════
-
-test_and_add() {
+# Function to test an API and categorize it
+test_and_categorize_api() {
   local name="$1"
   local url="$2"
-  local desc="$3"
-  local category="$4"
   
-  STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$url" 2>/dev/null || echo "000")
-  if [ "$STATUS" = "200" ]; then
-    log INFO "  ✅ $name (HTTP $STATUS)"
-    FOUND=$((FOUND+1))
-    # Add to JSON
-    python3 -c "
-import json
-db = json.load(open('$API_DB'))
-entry = {'name':'$name','url':'$url','desc':'$desc','category':'$category','status':'live','signup':'none'}
-if not any(a['name'] == '$name' for a in db['apis']):
-    db['apis'].append(entry)
-db['last_scan'] = '$(now)'
-json.dump(db, open('$API_DB','w'), indent=2)
-" 2>/dev/null || true
+  log INFO "Testing API: $name"
+  
+  # Test with curl, timeout after 10 seconds
+  local response
+  response=$(curl -s --max-time 10 -w "%{http_code}" "$url" || echo "000")
+  local http_code="${response: -3}"
+  local body="${response:0:-3}"
+  
+  # Determine if we got a successful response (2xx or 3xx)
+  if [[ "$http_code" =~ ^[23][0-9]{2}$ ]]; then
+    # Further checks to determine if signup/login is required
+    # Check if response indicates authentication required
+    if echo "$body" | grep -i -E '"error".*(unauthorized|authentication|api.key|access.denied|forbidden)' >/dev/null 2>&1; then
+      # Likely requires authentication/key
+      log INFO "  $name: Appears to require authentication/key -> PAID/FREEMium"
+      # For simplicity, we'll treat as freemium if it gave some response but with auth error
+      # In reality, we'd need to test if there's a free tier
+      echo "{\"name\": \"$name\", \"url\": \"$url\", \"type\": \"freemium\", \"signup_required\": true, \"key_required\": true, \"notes\": \"API returned auth error - may have free tier\"}" >> "${FREEMIUM_FILE}.tmp"
+    else
+      # Successful response without obvious auth error -> likely free
+      log INFO "  $name: Successful response -> FREE"
+      echo "{\"name\": \"$name\", \"url\": \"$url\", \"type\": \"free\", \"signup_required\": false, \"key_required\": false, \"notes\": \"API accessible without authentication\"}" >> "${FREE}.tmp"
+    fi
+  elif [[ "$http_code" =~ ^4[0-9]{2}$ ]]; then
+    # 4xx errors - could be missing key, or not found
+    if echo "$body" | grep -i -E '"error".*(unauthorized|authentication|api.key|access.denied|forbidden|missing)' >/dev/null 2>&1; then
+      log INFO "  $name: Auth error (4xx) -> FREEMium/PAID"
+      echo "{\"name\": \"$name\", \"url\": \"$url\", \"type\": \"freemium\", \"signup_required\": true, \"key_required\": true, \"notes\": \"API returned authentication error - may have free tier\"}" >> "${FREEMIUM_FILE}.tmp"
+    else
+      log INFO "  $name: Client error (4xx) -> Possibly not available or limited -> PAID"
+      echo "{\"name\": \"$name\", \"url\": \"$url\", \"type\": \"paid\", \"signup_required\": true, \"key_required\": true, \"notes\": \"API returned client error - may require paid plan\"}" >> "${PAID}.tmp"
+    fi
   else
-    log INFO "  ⚠️ $name (HTTP $STATUS)"
+    # 5xx errors or timeout/connection issues
+    log WARN "  $name: Server error or timeout (${http_code}) -> Unable to determine, skipping"
+    # Skip for now
   fi
 }
 
-log INFO "Testing free APIs (no signup)..."
+# Temporary files for accumulating results
+> "${FREE}.tmp"
+> "${FREEMIUM}.tmp"
+> "${PAID}.tmp"
+> "${CATEGORIZED}.tmp"
 
-# ═══ AI APIs (no signup) ═══
-log INFO "AI APIs:"
-test_and_add "HuggingFace-Inference" "https://api-inference.huggingface.co/models" "Free AI inference, no signup for some models" "ai"
-test_and_add "LibreTranslate" "https://libretranslate.com/languages" "Free translation, no key" "ai"
+# Test each API
+for name in "${!TEST_APIS[@]}"; do
+  url="${TEST_APIS[$name]}"
+  test_and_categorize_api "$name" "$url"
+done
 
-# ═══ Weather APIs ═══
-log INFO "Weather APIs:"
-test_and_add "OpenMeteo" "https://api.open-meteo.com/v1/forecast?latitude=0&longitude=0&current_weather=true" "Free weather, no key" "weather"
-test_and_add "wttr.in" "https://wttr.in/?format=j1" "Weather in JSON, no key" "weather"
+# Combine results into proper JSON arrays
+if [ -s "${FREE}.tmp" ]; then
+  echo "[" > "${API_FILE}"
+  cat "${FREE}.tmp" | sed '$s/,$//' | tr '\n' ',' | sed 's/,$//' >> "${API_FILE}"
+  echo "]" >> "${API_FILE}"
+else
+  echo "[]" > "${API_FILE}"
+fi
 
-# ═══ Data APIs ═══
-log INFO "Data APIs:"
-test_and_add "RESTCountries" "https://restcountries.com/v3.1/all?fields=name" "Country data, no key" "data"
-test_and_add "OpenLibrary" "https://openlibrary.org/api/books?bibkeys=ISBN:0451526538&format=json" "Book data, no key" "data"
-test_and_add "PokeAPI" "https://pokeapi.co/api/v2/pokemon/1" "Pokemon data, no key" "data"
-test_and_add "Jikan" "https://api.jikan.moe/v4/anime/1" "Anime data, no key" "data"
-test_and_add "Dictionary" "https://api.dictionaryapi.dev/api/v2/entries/en/hello" "Dictionary, no key" "data"
-test_and_add "ExchangeRate" "https://open.er-api.com/v6/latest/USD" "Currency rates, no key" "finance"
-test_and_add "IP-Geolocation" "https://ipapi.co/json/" "IP info, no key" "tools"
+if [ -s "${FREEMIUM}.tmp" ]; then
+  echo "[" > "${FREEMIUM_FILE}"
+  cat "${FREEMIUM}.tmp" | sed '$s/,$//' | tr '\n' ',' | sed 's/,$//' >> "${FREEMIUM_FILE}"
+  echo "]" >> "${FREEMIUM_FILE}"
+else
+  echo "[]" > "${FREEMIER_FILE}"
+fi
 
-# ═══ News APIs ═══
-log INFO "News APIs:"
-test_and_add "HN-API" "https://hacker-news.firebaseio.com/v0/topstories.json" "Hacker News, no key" "news"
-test_and_add "DevTo" "https://dev.to/api/articles?top=7" "Dev.to articles, no key" "news"
+if [ -s "${PAID}.tmp" ]; then
+  echo "[" > "${PAID_FILE}"
+  cat "${PAID}.tmp" | sed '$s/,$//' | tr '\n' ',' | sed 's/,$//' >> "${PAID_FILE}"
+  echo "]" >> "${PAID_FILE}"
+else
+  echo "[]" > "${PAID_FILE}"
+fi
 
-# ═══ GitHub APIs ═══
-log INFO "GitHub APIs:"
-test_and_add "GitHub-Trending" "https://api.github.com/search/repositories?q=stars:>10000&sort=stars" "Trending repos, no key" "github"
-test_and_add "GitHub-Users" "https://api.github.com/users/github" "User data, no key" "github"
+# Create combined categorized file
+{
+  echo "{"
+  echo "  \"free\": $(cat "${API_FILE}"),"
+  echo "  \"freemium\": $(cat "${FREEMIUM_FILE}"),"
+  echo "  \"paid\": $(cat "${PAID_FILE}")"
+  echo "}"
+} > "${CATEGORIZED_FILE}"
 
-# ═══ Tools APIs ═══
-log INFO "Tool APIs:"
-test_and_add "QR-GoQR" "https://goqr.me/api/v1/create?data=hello&size=100x100" "QR code gen, no key" "tools"
-test_and_add "Lorem-Ipsum" "https://loripsum.net/api/1/short" "Lorem ipsum, no key" "tools"
-test_and_add "RandomUser" "https://randomuser.me/api/" "Random user data, no key" "tools"
-test_and_add "Jokes" "https://v2.jokeapi.dev/joke/Any" "Jokes API, no key" "fun"
-test_and_add "Quotes" "https://api.quotable.io/random" "Quotes, no key" "fun"
+# Clean up temporary files
+rm -f "${FREE}.tmp" "${FREEMIUM}.tmp" "${PAID}.tmp"
 
-# ═══ Music/Entertainment ═══
-log INFO "Entertainment APIs:"
-test_and_add "Lyrics-OVH" "https://api.lyrics.ovh/v1/coldplay/yellow" "Lyrics, no key" "music"
-test_and_add "Cat-Facts" "https://catfact.ninja/fact" "Cat facts, no key" "fun"
-test_and_add "Dog-Facts" "https://dogapi.dog/api/v2/facts" "Dog facts, no key" "fun"
+# Generate report
+log INFO "Generating API categorization report..."
+cat > "${REPORT}" << EOF
+# 🔍 Free API Hunter Report - With Categorization
+**Generated:** $(date -u '+%Y-%m-%d %H:%M UTC')
+**Repository:** $GITHUB_REPOSITORY
 
-# ═══ Generate Report ═══
-TOTAL=$(jq '.apis | length' "$API_DB" 2>/dev/null || echo "0")
+## 📊 API Categorization Summary
 
-cat > "$REPORT" << REOF
-# 🆓 Free API Hunter Report
-**Date:** $(date -u '+%Y-%m-%d %H:%M UTC')
-**New Found:** $FOUND
-**Total Catalogued:** $TOTAL
+### Free APIs (No signup, no key, no limits)
+$(jq length "${API_FILE}" 2>/dev/null || echo "0") APIs
 
-## No-Signup APIs Found
+### Freemium APIs (Signup required, free tier available)
+$(jq length "${FREEMIUM_FILE}" 2>/dev/null || echo "0") APIs
 
-### 🤖 AI & Language
-- **HuggingFace Inference** — Free AI models, some no signup
-- **LibreTranslate** — Free translation
+### Paid APIs (Payment required for any usage)
+$(jq length "${PAID_FILE}" 2>/dev/null || echo "0") APIs
 
-### 🌤️ Weather
-- **Open-Meteo** — Full weather data, completely free
-- **wttr.in** — Weather in JSON
+## 📋 Details
 
-### 📊 Data
-- **REST Countries** — Country info
-- **Open Library** — Book database
-- **PokeAPI** — Pokemon data
-- **Jikan** — Anime database
-- **Dictionary** — Word definitions
-- **ExchangeRate** — Currency rates
+### Free APIs
+$(jq -r '.[] | "- **\(.name)** (\(.url)): \(.notes // "No additional notes")"' "${API_FILE}" 2>/dev/null || echo "_No free APIs found_")
 
-### 📰 News
-- **Hacker News API** — Tech news
-- **DevTo API** — Dev articles
+### Freemium APIs
+$(jq -r '.[] | "- **\(.name)** (\(.url)): \(.notes // "No additional notes")"' "${FREEMIUM_FILE}" 2>/dev/null || echo "_No freemium APIs found_")
 
-### 🔧 Tools
-- **IP Geolocation** — IP lookup
-- **QR Generator** — QR codes
-- **RandomUser** — Fake user data
+### Paid APIs
+$(jq -r '.[] | "- **\(.name)** (\(.url)): \(.notes // "No additional notes")"' "${PAID_FILE}" 2>/dev/null || echo "_No paid APIs found_")
 
-### 😄 Fun
-- **Jokes API** — Random jokes
-- **Quotes** — Inspirational quotes
-- **Cat/Dog Facts** — Animal facts
+## 📈 Next Steps
+1. Review any new APIs discovered
+2. Consider testing freemium APIs for free tier usability
+3. Update bot configurations to utilize new free APIs
+4. Share findings with team
+EOF
 
-## Usage in Bots
-All bots can now use these APIs:
-\`\`\`bash
-source shared/utils.sh
-WEATHER=$(http_get "https://api.open-meteo.com/v1/forecast?latitude=14.5995&longitude=120.9842&current_weather=true")
-COUNTRIES=$(http_get "https://restcountries.com/v3.1/name/philippines")
-\`\`\`
+cat "${REPORT}"
 
----
-_Automated by Free API Hunter 🆓_
-REOF
-
-cat "$REPORT"
-notify "Free API Hunter" "Found $FOUND new free APIs (no signup). Total: $TOTAL"
+# Notify completion
+notify "$BOT" "Free API Hunter completed. Found $(jq length "${API_FILE}" 2>/dev/null || echo "0") free, $(jq length "${FREEMIUM_FILE}" 2>/dev/null || echo "0") freemium, $(jq length "${PAID_FILE}" 2>/dev/null || echo "0") paid APIs." 2>/dev/null || true
+log INFO "🔍 Free API Hunter completed successfully"
 exit 0
