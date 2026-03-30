@@ -1,0 +1,21 @@
+name: 🚀 Persistent Deploy
+on:
+  push:
+    branches: [main]
+    paths: ["package.json", "src/**", "index.html", "*.js", "*.css"]
+  workflow_dispatch: {}
+permissions: { contents: write, pages: write, id-token: write }
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: 🚀 Generate Deploy Configs
+        env: { GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}", OPENROUTER_API_KEY: "${{ secrets.OPENROUTER_API_KEY }}", OLLAMA_API_KEY: "${{ secrets.OLLAMA_API_KEY }}", REPO: "${{ github.repository }}" }
+        run: |
+          source shared/utils.sh
+          source shared/state.sh
+          bash bots/persistent-deploy/scripts/persistent-deploy.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: deploy-report, path: persistent-deploy-report.md }

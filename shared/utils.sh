@@ -307,9 +307,14 @@ get_configured_providers() {
 }
 
 # ═══════════════════════════════════════════════════════
-# AI Engine v3 — Load specialized AI functions
+# Shared State — Bot-to-Bot Communication
 # ═══════════════════════════════════════════════════════
 SCRIPT_DIR="${GITHUB_WORKSPACE:-.}"
+[ -f "$SCRIPT_DIR/shared/state.sh" ] && source "$SCRIPT_DIR/shared/state.sh"
+
+# ═══════════════════════════════════════════════════════
+# AI Engine v4 — Load specialized AI functions
+# ═══════════════════════════════════════════════════════
 [ -f "$SCRIPT_DIR/shared/ai-engine.sh" ] && source "$SCRIPT_DIR/shared/ai-engine.sh"
 
 # ═══════════════════════════════════════════════════════

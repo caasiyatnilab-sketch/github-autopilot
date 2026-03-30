@@ -1,0 +1,20 @@
+name: 🧬 Self-Evolver
+on:
+  schedule: [{ cron: "0 3 * * *" }]
+  workflow_dispatch: {}
+permissions: { contents: write, issues: write }
+jobs:
+  evolve:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { token: "${{ secrets.GITHUB_TOKEN }}" }
+      - name: 🧬 Self-Evolve
+        env: { GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}", REPO: "${{ github.repository }}", OPENROUTER_API_KEY: "${{ secrets.OPENROUTER_API_KEY }}", OLLAMA_API_KEY: "${{ secrets.OLLAMA_API_KEY }}", GROQ_API_KEY: "${{ secrets.GROQ_API_KEY }}" }
+        run: |
+          source shared/utils.sh
+          source shared/state.sh
+          bash bots/self-evolver/scripts/self-evolver.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: evolver-report, path: self-evolver-report.md }

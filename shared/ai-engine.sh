@@ -97,6 +97,20 @@ _call_huggingface() {
   return 1
 }
 
+_call_ollama() {
+  local prompt="$1" model="${2:-gemma3:4b}"
+  [ -z "${OLLAMA_API_KEY:-}" ] && return 1
+  local result
+  result=$(curl -s --max-time 30 "https://ollama.com/api/chat" \
+    -H "Authorization: Bearer $OLLAMA_API_KEY" \
+    -H "Content-Type: application/json" \
+    -d "{\"model\":\"$model\",\"messages\":[{\"role\":\"user\",\"content\":$(echo "$prompt" | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()))')}],\"stream\":false}" 2>/dev/null)
+  local reply
+  reply=$(echo "$result" | jq -r '.message.content // empty' 2>/dev/null)
+  [ -n "$reply" ] && echo "$reply" && return 0
+  return 1
+}
+
 _call_openai() {
   local prompt="$1" model="${2:-gpt-4o-mini}"
   [ -z "${OPENAI_API_KEY:-}" ] && return 1
@@ -118,22 +132,26 @@ ai_smart() {
   local prompt="$1"
   local task_type="${2:-general}"
 
-  # Code-heavy tasks → try Groq 70B first, then OpenRouter
+  # Code-heavy tasks → try best models first
   case "$task_type" in
     code|review|security|creative)
+      _call_ollama "$prompt" "qwen3-coder-next" && return 0
+      _call_ollama "$prompt" "glm-5" && return 0
       _call_groq "$prompt" "llama-3.3-70b-versatile" && return 0
       _call_openrouter "$prompt" "nvidia/nemotron-3-super-120b-a12b:free" && return 0
       _call_openrouter "$prompt" "qwen/qwen3-next-80b-a3b-instruct:free" && return 0
       ;;
   esac
 
-  # Fast tasks → try fastest free providers first
+  # Fast tasks → try fastest providers first
+  _call_ollama "$prompt" "gemma3:4b" && return 0
   _call_groq "$prompt" "llama-3.1-8b-instant" && return 0
   _call_openrouter "$prompt" "nvidia/nemotron-3-super-120b-a12b:free" && return 0
   _call_openrouter "$prompt" "stepfun/step-3.5-flash:free" && return 0
   _call_openrouter "$prompt" "arcee-ai/trinity-mini:free" && return 0
 
   # Fallback to other providers
+  _call_ollama "$prompt" "ministral-3:3b" && return 0
   _call_together "$prompt" && return 0
   _call_mistral "$prompt" && return 0
   _call_deepinfra "$prompt" && return 0
@@ -178,6 +196,7 @@ ai_review()           { ai_smart "Review this code for bugs, security issues, an
 # ─── Provider Health Check ────────────────────────────────
 ai_health_check() {
   echo "🤖 AI Provider Status:"
+  [ -n "${OLLAMA_API_KEY:-}" ]        && echo "  ✅ Ollama Cloud (glm-5, qwen3-coder, gemma3, 35+ models)" || echo "  ⬜ Ollama Cloud"
   [ -n "${GROQ_API_KEY:-}" ]         && echo "  ✅ Groq (llama-3.1-8b-instant, llama-3.3-70b)" || echo "  ⬜ Groq"
   [ -n "${OPENROUTER_API_KEY:-}" ]   && echo "  ✅ OpenRouter (24 free models)"              || echo "  ⬜ OpenRouter"
   [ -n "${TOGETHER_API_KEY:-}" ]     && echo "  ✅ Together (Llama, Mistral)"                || echo "  ⬜ Together"
