@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin Dashboard</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui;background:#0f0f23;color:#eee;display:flex;min-height:100vh}
+.sidebar{width:250px;background:#16213e;padding:1.5rem}
+.sidebar h2{color:#00d4ff;margin-bottom:2rem}
+.sidebar a{display:block;padding:.8rem 1rem;color:#aaa;text-decoration:none;border-radius:8px;margin:.3rem 0;transition:.2s}
+.sidebar a:hover,.sidebar a.active{background:rgba(102,126,234,.2);color:#fff}
+.main{flex:1;padding:2rem}
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem}
+.header h1{font-size:1.8rem}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;margin-bottom:2rem}
+.stat-card{background:#16213e;padding:1.5rem;border-radius:12px}
+.stat-card .label{color:#888;font-size:.9rem}
+.stat-card .value{font-size:2rem;font-weight:bold;margin:.3rem 0}
+.stat-card .change{font-size:.85rem}
+.stat-card .change.up{color:#27ca40}
+.stat-card .change.down{color:#ff5f56}
+.chart{background:#16213e;border-radius:12px;padding:1.5rem;margin-bottom:2rem}
+.chart h3{margin-bottom:1rem}
+.chart canvas{width:100%;height:200px}
+.table{background:#16213e;border-radius:12px;padding:1.5rem}
+.table h3{margin-bottom:1rem}
+table{width:100%;border-collapse:collapse}
+th,td{padding:.8rem;text-align:left;border-bottom:1px solid #1a1a3e}
+th{color:#888;font-weight:normal}
+.badge{padding:.3rem .8rem;border-radius:20px;font-size:.8rem}
+.badge.success{background:rgba(39,202,64,.2);color:#27ca40}
+.badge.warning{background:rgba(255,189,46,.2);color:#ffbd2e}
+.badge.danger{background:rgba(255,95,86,.2);color:#ff5f56}
+</style>
+</head><body>
+<div class="sidebar">
+  <h2>📊 Dashboard</h2>
+  <a href="#" class="active">🏠 Overview</a>
+  <a href="#">📈 Analytics</a>
+  <a href="#">👥 Users</a>
+  <a href="#">📦 Products</a>
+  <a href="#">💬 Messages</a>
+  <a href="#">⚙️ Settings</a>
+</div>
+<div class="main">
+  <div class="header"><h1>Overview</h1><div>Last updated: Just now</div></div>
+  <div class="stats">
+    <div class="stat-card"><div class="label">Total Users</div><div class="value">12,847</div><div class="change up">↑ 12.5%</div></div>
+    <div class="stat-card"><div class="label">Revenue</div><div class="value">$48,352</div><div class="change up">↑ 8.2%</div></div>
+    <div class="stat-card"><div class="label">Orders</div><div class="value">3,284</div><div class="change down">↓ 2.1%</div></div>
+    <div class="stat-card"><div class="label">Conversion</div><div class="value">3.24%</div><div class="change up">↑ 0.8%</div></div>
+  </div>
+  <div class="table">
+    <h3>Recent Orders</h3>
+    <table><thead><tr><th>Order</th><th>Customer</th><th>Amount</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td>#12847</td><td>Alice Johnson</td><td>$234.00</td><td><span class="badge success">Completed</span></td></tr>
+      <tr><td>#12846</td><td>Bob Smith</td><td>$89.50</td><td><span class="badge warning">Pending</span></td></tr>
+      <tr><td>#12845</td><td>Charlie Brown</td><td>$432.00</td><td><span class="badge success">Completed</span></td></tr>
+      <tr><td>#12844</td><td>Diana Prince</td><td>$156.75</td><td><span class="badge danger">Cancelled</span></td></tr>
+      <tr><td>#12843</td><td>Eve Wilson</td><td>$78.25</td><td><span class="badge success">Completed</span></td></tr>
+    </tbody></table>
+  </div>
+</div>
+</body></html>
