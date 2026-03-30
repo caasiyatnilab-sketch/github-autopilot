@@ -1,17 +1,30 @@
 {
-  "api_keys": {},
+  "api_keys": {
+    "groq": {
+      "status": "active",
+      "type": "ai",
+      "checked": "2026-03-30T11:37:51Z",
+      "auto_rotate": true
+    },
+    "openrouter": {
+      "status": "active",
+      "type": "ai",
+      "checked": "2026-03-30T11:37:51Z",
+      "auto_rotate": true
+    }
+  },
   "active_projects": [],
   "bot_health": {
-    "passing": 0,
-    "failing": 0,
-    "score": 0
+    "passing": 2,
+    "failing": 2,
+    "score": 40
   },
   "upgrades_needed": [],
-  "last_sync": "2026-03-27T14:14:42Z",
+  "last_sync": "2026-03-30T11:37:51Z",
   "auto_deploy": true,
   "self_upgrade": true,
-  "upgrades_applied": 0,
-  "last_upgrade": "2026-03-27T14:14:42Z",
+  "upgrades_applied": 11,
+  "last_upgrade": "2026-03-30T11:37:52Z",
   "": {
     "bot_results": [
       {
@@ -37,6 +50,48 @@
         "status": "success",
         "message": "4 training improvements",
         "timestamp": "2026-03-30T09:13:25Z"
+      },
+      {
+        "bot": "bot-brain",
+        "status": "success",
+        "message": "completed",
+        "timestamp": "2026-03-30T11:37:52Z"
+      },
+      {
+        "bot": "bot-brain",
+        "status": "success",
+        "message": "completed",
+        "timestamp": "2026-03-30T11:37:52Z"
+      },
+      {
+        "bot": "bot-brain",
+        "status": "success",
+        "message": "completed",
+        "timestamp": "2026-03-30T11:37:52Z"
+      },
+      {
+        "bot": "bot-brain",
+        "status": "success",
+        "message": "completed",
+        "timestamp": "2026-03-30T11:37:52Z"
+      },
+      {
+        "bot": "bot-brain",
+        "status": "success",
+        "message": "completed",
+        "timestamp": "2026-03-30T11:37:52Z"
+      },
+      {
+        "bot": "bot-brain",
+        "status": "success",
+        "message": "completed",
+        "timestamp": "2026-03-30T11:37:52Z"
+      },
+      {
+        "bot": "bot-brain",
+        "status": "success",
+        "message": "completed",
+        "timestamp": "2026-03-30T11:37:52Z"
       }
     ],
     "bot_health": {
@@ -55,6 +110,10 @@
       "bot-trainer": {
         "status": "success",
         "last_run": "2026-03-30T09:13:25Z"
+      },
+      "bot-brain": {
+        "status": "success",
+        "last_run": "2026-03-30T11:37:52Z"
       }
     },
     "shared_data": {
