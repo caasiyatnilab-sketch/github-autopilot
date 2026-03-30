@@ -42,6 +42,6 @@ open('$REPORT', 'w').write(lines)
 record_result "weekly-reporter" "success" "completed" 2>/dev/null || true
 cat "$REPORT"
 
-notify "$(basename $BOT_NAME 2>/dev/null || basename $0)" "Bot completed successfully. Check report." 2>/dev/null || true
+notify "$(basename $BOT 2>/dev/null || basename $0)" "Bot completed successfully. Check report." 2>/dev/null || true
 
 exit 0

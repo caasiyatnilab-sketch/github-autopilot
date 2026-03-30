@@ -4,7 +4,7 @@ trap 'record_result "issue-pr-manager" "error" "script exited with error" 2>/dev
 source "${GITHUB_WORKSPACE:-.}/shared/utils.sh"
 log INFO "issue-pr-manager starting..."
 source "${GITHUB_WORKSPACE:-.}/shared/state.sh"
-ACTION="${1:-all}"; REPORT="issue-pr-manager-report.md"
+ACTION="${1:-all}"; REPORT="issue-pr-manager-report.md"; BOT="issue-pr-manager"
 
 label_issue() {
   local num="${GITHUB_EVENT_ISSUE_NUMBER:-}"; [ -z "$num" ] && return 0
@@ -43,6 +43,6 @@ open('$REPORT', 'w').write(lines)
 record_result "issue-pr-manager" "success" "completed" 2>/dev/null || true
 cat "$REPORT"
 
-notify "$(basename $BOT_NAME 2>/dev/null || basename $0)" "Bot completed successfully. Check report." 2>/dev/null || true
+notify "$(basename $BOT 2>/dev/null || basename $0)" "Bot completed successfully. Check report." 2>/dev/null || true
 
 exit 0

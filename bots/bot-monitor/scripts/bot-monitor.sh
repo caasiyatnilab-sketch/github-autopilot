@@ -4,6 +4,7 @@ trap 'record_result "bot-monitor" "error" "script exited with error" 2>/dev/null
 source "${GITHUB_WORKSPACE:-.}/shared/utils.sh"
 source "${GITHUB_WORKSPACE:-.}/shared/state.sh"
 BOT="bot-monitor"; REPORT="bot-monitor-report.md"
+REPO="$(get_repo)"
 log INFO "🤖 Bot Monitor starting..."
 
 # List of all bots to monitor

@@ -6,6 +6,7 @@ source "${GITHUB_WORKSPACE:-.}/shared/utils.sh"
 source "${GITHUB_WORKSPACE:-.}/shared/state.sh"
 
 REPORT="deploy-report.md"
+BOT="deploy-bot"
 log INFO "🚀 Deploy Bot starting..."
 
 # Detect project
@@ -34,7 +35,7 @@ REOF
 record_result "deploy-bot" "success" "completed" 2>/dev/null || true
   cat "$REPORT"
 
-notify "$(basename $BOT_NAME 2>/dev/null || basename $0)" "Bot completed successfully. Check report." 2>/dev/null || true
+notify "$(basename $BOT 2>/dev/null || basename $0)" "Bot completed successfully. Check report." 2>/dev/null || true
   log INFO "🚀 Deploy Bot complete (nothing to deploy)"
   exit 0
 fi
@@ -81,6 +82,6 @@ REOF
 record_result "deploy-bot" "success" "completed" 2>/dev/null || true
 cat "$REPORT"
 
-notify "$(basename $BOT_NAME 2>/dev/null || basename $0)" "Bot completed successfully. Check report." 2>/dev/null || true
+notify "$(basename $BOT 2>/dev/null || basename $0)" "Bot completed successfully. Check report." 2>/dev/null || true
 log INFO "🚀 Deploy Bot complete!"
 exit 0

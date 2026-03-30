@@ -4,6 +4,7 @@ trap 'record_result "free-api-hunter" "error" "script exited with error" 2>/dev/
 source "${GITHUB_WORKSPACE:-.}/shared/utils.sh"
 source "${GITHUB_WORKSPACE:-.}/shared/state.sh"
 BOT="free-api-hunter"; REPORT="free-api-report.md"
+GITHUB_REPOSITORY="$(get_repo)"
 log INFO "🔍 Free API Hunter starting..."
 
 # Directory for API data
@@ -65,7 +66,7 @@ test_and_categorize_api() {
     else
       # Successful response without obvious auth error -> likely free
       log INFO "  $name: Successful response -> FREE"
-      echo "{\"name\": \"$name\", \"url\": \"$url\", \"type\": \"free\", \"signup_required\": false, \"key_required\": false, \"notes\": \"API accessible without authentication\"}" >> "${FREE}.tmp"
+      echo "{\"name\": \"$name\", \"url\": \"$url\", \"type\": \"free\", \"signup_required\": false, \"key_required\": false, \"notes\": \"API accessible without authentication\"}" >> "${API_FILE}.tmp"
     fi
   elif [[ "$http_code" =~ ^4[0-9]{2}$ ]]; then
     # 4xx errors - could be missing key, or not found
@@ -74,7 +75,7 @@ test_and_categorize_api() {
       echo "{\"name\": \"$name\", \"url\": \"$url\", \"type\": \"freemium\", \"signup_required\": true, \"key_required\": true, \"notes\": \"API returned authentication error - may have free tier\"}" >> "${FREEMIUM_FILE}.tmp"
     else
       log INFO "  $name: Client error (4xx) -> Possibly not available or limited -> PAID"
-      echo "{\"name\": \"$name\", \"url\": \"$url\", \"type\": \"paid\", \"signup_required\": true, \"key_required\": true, \"notes\": \"API returned client error - may require paid plan\"}" >> "${PAID}.tmp"
+      echo "{\"name\": \"$name\", \"url\": \"$url\", \"type\": \"paid\", \"signup_required\": true, \"key_required\": true, \"notes\": \"API returned client error - may require paid plan\"}" >> "${PAID_FILE}.tmp"
     fi
   else
     # 5xx errors or timeout/connection issues
@@ -84,10 +85,10 @@ test_and_categorize_api() {
 }
 
 # Temporary files for accumulating results
-> "${FREE}.tmp"
-> "${FREEMIUM}.tmp"
-> "${PAID}.tmp"
-> "${CATEGORIZED}.tmp"
+> "${API_FILE}.tmp"
+> "${FREEMIUM_FILE}.tmp"
+> "${PAID_FILE}.tmp"
+> "${CATEGORIZED_FILE}.tmp"
 
 # Test each API
 for name in "${!TEST_APIS[@]}"; do
@@ -96,25 +97,25 @@ for name in "${!TEST_APIS[@]}"; do
 done
 
 # Combine results into proper JSON arrays
-if [ -s "${FREE}.tmp" ]; then
+if [ -s "${API_FILE}.tmp" ]; then
   echo "[" > "${API_FILE}"
-  cat "${FREE}.tmp" | sed '$s/,$//' | tr '\n' ',' | sed 's/,$//' >> "${API_FILE}"
+  cat "${API_FILE}.tmp" | sed '$s/,$//' | tr '\n' ',' | sed 's/,$//' >> "${API_FILE}"
   echo "]" >> "${API_FILE}"
 else
   echo "[]" > "${API_FILE}"
 fi
 
-if [ -s "${FREEMIUM}.tmp" ]; then
+if [ -s "${FREEMIUM_FILE}.tmp" ]; then
   echo "[" > "${FREEMIUM_FILE}"
-  cat "${FREEMIUM}.tmp" | sed '$s/,$//' | tr '\n' ',' | sed 's/,$//' >> "${FREEMIUM_FILE}"
+  cat "${FREEMIUM_FILE}.tmp" | sed '$s/,$//' | tr '\n' ',' | sed 's/,$//' >> "${FREEMIUM_FILE}"
   echo "]" >> "${FREEMIUM_FILE}"
 else
-  echo "[]" > "${FREEMIER_FILE}"
+  echo "[]" > "${FREEMIUM_FILE}"
 fi
 
-if [ -s "${PAID}.tmp" ]; then
+if [ -s "${PAID_FILE}.tmp" ]; then
   echo "[" > "${PAID_FILE}"
-  cat "${PAID}.tmp" | sed '$s/,$//' | tr '\n' ',' | sed 's/,$//' >> "${PAID_FILE}"
+  cat "${PAID_FILE}.tmp" | sed '$s/,$//' | tr '\n' ',' | sed 's/,$//' >> "${PAID_FILE}"
   echo "]" >> "${PAID_FILE}"
 else
   echo "[]" > "${PAID_FILE}"
@@ -130,7 +131,7 @@ fi
 } > "${CATEGORIZED_FILE}"
 
 # Clean up temporary files
-rm -f "${FREE}.tmp" "${FREEMIUM}.tmp" "${PAID}.tmp"
+rm -f "${API_FILE}.tmp" "${FREEMIUM_FILE}.tmp" "${PAID_FILE}.tmp"
 
 # Generate report
 log INFO "Generating API categorization report..."
