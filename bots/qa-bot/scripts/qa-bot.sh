@@ -1,7 +1,9 @@
 #!/bin/bash
 # ✅ QA/QC Bot (Fixed)
 set -uo pipefail
+trap 'record_result "qa-bot" "error" "script exited with error" 2>/dev/null || true' ERR
 source "${GITHUB_WORKSPACE:-.}/shared/utils.sh"
+source "${GITHUB_WORKSPACE:-.}/shared/state.sh"
 
 REPORT="qa-bot-report.md"
 log INFO "✅ QA/QC Bot starting..."
@@ -15,6 +17,7 @@ if [ ! -d "creations" ] || [ -z "$(ls -A creations/ 2>/dev/null)" ]; then
 ---
 _Automated by QA/QC Bot ✅_
 REOF
+record_result "qa-bot" "success" "completed" 2>/dev/null || true
   cat "$REPORT"
   exit 0
 fi
@@ -46,5 +49,6 @@ cat > "$REPORT" << REOF
 _Automated by QA/QC Bot ✅_
 REOF
 
+record_result "qa-bot" "success" "completed" 2>/dev/null || true
 cat "$REPORT"
 exit 0

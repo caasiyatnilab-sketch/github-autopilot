@@ -1,6 +1,8 @@
 #!/bin/bash
 set -euo pipefail
+trap 'record_result "weekly-reporter" "error" "script exited with error" 2>/dev/null || true' ERR
 source "${GITHUB_WORKSPACE:-.}/shared/utils.sh"
+source "${GITHUB_WORKSPACE:-.}/shared/state.sh"
 BOT="weekly-reporter"; REPORT="weekly-reporter-report.md"
 log INFO "📊 Weekly Reporter starting..."
 WEEK_AGO=$(date -d "-7 days" +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -v-7d +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || echo "")
@@ -37,6 +39,7 @@ $OPEN_ISSUES
 $OPEN_PRS'''
 open('$REPORT', 'w').write(lines)
 "
+record_result "weekly-reporter" "success" "completed" 2>/dev/null || true
 cat "$REPORT"
 
 notify "$(basename $BOT_NAME 2>/dev/null || basename $0)" "Bot completed successfully. Check report." 2>/dev/null || true

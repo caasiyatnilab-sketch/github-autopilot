@@ -1,6 +1,9 @@
 #!/bin/bash
+BOT_NAME="health-checker"
 set -euo pipefail
+trap 'record_result "health-checker" "error" "script exited with error" 2>/dev/null || true' ERR
 source "${GITHUB_WORKSPACE:-.}/shared/utils.sh"
+source "${GITHUB_WORKSPACE:-.}/shared/state.sh"
 BOT="health-checker"; REPORT="health-checker-report.md"
 log INFO "🔍 Health Checker starting..."
 SCORE=100; ISSUES=()
@@ -48,6 +51,7 @@ lines = '''# 🔍 Health Check Report
 $ISSUE_LIST'''
 open('$REPORT', 'w').write(lines)
 "
+record_result "health-checker" "success" "completed" 2>/dev/null || true
 cat "$REPORT"
 
 notify "$(basename $BOT_NAME 2>/dev/null || basename $0)" "Bot completed successfully. Check report." 2>/dev/null || true

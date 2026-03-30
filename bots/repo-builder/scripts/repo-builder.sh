@@ -4,7 +4,9 @@
 # Works online (scheduled) and offline (triggered locally)
 
 set -euo pipefail
+trap 'record_result "repo-builder" "error" "script exited with error" 2>/dev/null || true' ERR
 source "${GITHUB_WORKSPACE:-.}/shared/utils.sh"
+source "${GITHUB_WORKSPACE:-.}/shared/state.sh"
 
 BOT_NAME="repo-builder"
 REPORT="repo-builder-report.md"
@@ -436,6 +438,7 @@ Add project ideas to \`.github/project-ideas.json\`:
 _Automated by Repo Builder 🏗️_
 EOF
 
+record_result "repo-builder" "success" "completed" 2>/dev/null || true
 cat "$REPORT"
 
 notify "$(basename $BOT_NAME 2>/dev/null || basename $0)" "Bot completed successfully. Check report." 2>/dev/null || true

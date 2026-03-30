@@ -3,7 +3,9 @@
 # API key rotation, health checks, free tier monitoring
 # Finds and manages freemium API keys for unstoppable AI usage
 set -euo pipefail
+trap 'record_result "copilot-rotator" "error" "script exited with error" 2>/dev/null || true' ERR
 source "${GITHUB_WORKSPACE:-.}/shared/utils.sh"
+source "${GITHUB_WORKSPACE:-.}/shared/state.sh"
 
 BOT_NAME="copilot-rotator"
 REPORT="copilot-rotator-report.md"
@@ -210,6 +212,7 @@ $(discover_free_keys)
 _Automated by Copilot Rotator 🔑_
 EOF
 
+record_result "copilot-rotator" "success" "completed" 2>/dev/null || true
 cat "$REPORT"
 
 notify "$(basename $BOT_NAME 2>/dev/null || basename $0)" "Bot completed successfully. Check report." 2>/dev/null || true

@@ -3,7 +3,9 @@
 # Finds ideas → Creates NEW GitHub repos → Builds full projects → Deploys → Reports live URL
 # Autonomous — no human intervention
 set -uo pipefail
+trap 'record_result "project-creator" "error" "script exited with error" 2>/dev/null || true' ERR
 source "${GITHUB_WORKSPACE:-.}/shared/utils.sh"
+source "${GITHUB_WORKSPACE:-.}/shared/state.sh"
 
 REPORT="project-creator-report.md"
 log INFO "🏗️ Project Creator Bot starting..."
@@ -230,6 +232,7 @@ $(for url in "${CREATED_URLS[@]}"; do echo "- 🔗 $url"; done)
 _Automated by Project Creator Bot 🏗️_
 REOF
 
+record_result "project-creator" "success" "completed" 2>/dev/null || true
 cat "$REPORT"
 notify "Project Creator" "Created ${#CREATED_REPOS[@]} new repos! Check live URLs."
 exit 0

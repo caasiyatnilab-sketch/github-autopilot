@@ -1,6 +1,8 @@
 #!/bin/bash
 set -euo pipefail
+trap 'record_result "free-api-hunter" "error" "script exited with error" 2>/dev/null || true' ERR
 source "${GITHUB_WORKSPACE:-.}/shared/utils.sh"
+source "${GITHUB_WORKSPACE:-.}/shared/state.sh"
 BOT="free-api-hunter"; REPORT="free-api-report.md"
 log INFO "🔍 Free API Hunter starting..."
 

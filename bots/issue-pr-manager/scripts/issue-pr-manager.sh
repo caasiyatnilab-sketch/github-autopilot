@@ -1,6 +1,8 @@
 #!/bin/bash
 set -euo pipefail
+trap 'record_result "issue-pr-manager" "error" "script exited with error" 2>/dev/null || true' ERR
 source "${GITHUB_WORKSPACE:-.}/shared/utils.sh"
+source "${GITHUB_WORKSPACE:-.}/shared/state.sh"
 ACTION="${1:-all}"; REPORT="issue-pr-manager-report.md"
 
 label_issue() {
@@ -37,6 +39,7 @@ lines = '''# 🏷️ Issue & PR Manager Report
 ✅ Completed'''
 open('$REPORT', 'w').write(lines)
 "
+record_result "issue-pr-manager" "success" "completed" 2>/dev/null || true
 cat "$REPORT"
 
 notify "$(basename $BOT_NAME 2>/dev/null || basename $0)" "Bot completed successfully. Check report." 2>/dev/null || true

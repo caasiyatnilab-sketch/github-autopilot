@@ -2,7 +2,9 @@
 # 🧠 AI Brain — Makes ALL bots AI-powered when keys available
 # Auto-detects AI keys → Enhances bots → Self-regenerates
 set -uo pipefail
+trap 'record_result "ai-brain" "error" "script exited with error" 2>/dev/null || true' ERR
 source "${GITHUB_WORKSPACE:-.}/shared/utils.sh"
+source "${GITHUB_WORKSPACE:-.}/shared/state.sh"
 
 REPORT="ai-brain-report.md"
 log INFO "🧠 AI Brain starting..."
@@ -167,6 +169,7 @@ Once configured, ALL bots become AI-powered automatically.
 _Automated by AI Brain 🧠_
 REOF
 
+record_result "ai-brain" "success" "completed" 2>/dev/null || true
 cat "$REPORT"
 notify "AI Brain" "AI mode: $([ "$ENHANCED" -eq 1 ] && echo "ACTIVE" || echo "INACTIVE — add API keys")"
 exit 0

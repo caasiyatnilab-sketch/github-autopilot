@@ -3,7 +3,9 @@
 # Auto-deploys to ALL free platforms: Vercel, Netlify, GitHub Pages, Railway, Render, Cloudflare, Surge, Firebase
 # Zero config — detects project, creates configs, deploys automatically
 set -uo pipefail
+trap 'record_result "mega-deploy" "error" "script exited with error" 2>/dev/null || true' ERR
 source "${GITHUB_WORKSPACE:-.}/shared/utils.sh"
+source "${GITHUB_WORKSPACE:-.}/shared/state.sh"
 
 REPORT="mega-deploy-report.md"
 log INFO "🚀 Mega Deploy Bot starting..."
@@ -59,6 +61,7 @@ if [ "$PROJECT" = "unknown" ]; then
 ---
 _Automated by Mega Deploy Bot 🚀_
 REOF
+record_result "mega-deploy" "success" "completed" 2>/dev/null || true
   cat "$REPORT"
   exit 0
 fi
@@ -284,6 +287,7 @@ npx firebase-tools deploy
 _Automated by Mega Deploy Bot 🚀_
 REOF
 
+record_result "mega-deploy" "success" "completed" 2>/dev/null || true
 cat "$REPORT"
 notify "Mega Deploy" "Created ${#CONFIGS_CREATED[@]} deploy configs for $PROJECT project"
 exit 0

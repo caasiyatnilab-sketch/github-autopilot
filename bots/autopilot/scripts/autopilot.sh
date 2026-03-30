@@ -2,7 +2,9 @@
 # 🎯 Autopilot — Master Orchestrator
 # Coordinates all bots, monitors health, ensures nothing breaks
 set -euo pipefail
+trap 'record_result "autopilot" "error" "script exited with error" 2>/dev/null || true' ERR
 source "${GITHUB_WORKSPACE:-.}/shared/utils.sh"
+source "${GITHUB_WORKSPACE:-.}/shared/state.sh"
 
 BOT_NAME="autopilot"
 REPORT="autopilot-report.md"
@@ -151,6 +153,7 @@ echo "**Bot Health: $BOTS_HEALTHY/$BOTS_TOTAL healthy**" >> "$REPORT"
 echo "" >> "$REPORT"
 echo "_Automated by Autopilot 🎯_" >> "$REPORT"
 
+record_result "autopilot" "success" "completed" 2>/dev/null || true
 cat "$REPORT"
 
 notify "$(basename $BOT_NAME 2>/dev/null || basename $0)" "Bot completed successfully. Check report." 2>/dev/null || true

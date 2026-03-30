@@ -1,7 +1,9 @@
 #!/bin/bash
 # 🚀 Deploy Bot
 set -euo pipefail
+trap 'record_result "deploy-bot" "error" "script exited with error" 2>/dev/null || true' ERR
 source "${GITHUB_WORKSPACE:-.}/shared/utils.sh"
+source "${GITHUB_WORKSPACE:-.}/shared/state.sh"
 
 REPORT="deploy-report.md"
 log INFO "🚀 Deploy Bot starting..."
@@ -29,6 +31,7 @@ if [ "$PROJECT_TYPE" = "unknown" ]; then
 ---
 _Automated by Deploy Bot 🚀_
 REOF
+record_result "deploy-bot" "success" "completed" 2>/dev/null || true
   cat "$REPORT"
 
 notify "$(basename $BOT_NAME 2>/dev/null || basename $0)" "Bot completed successfully. Check report." 2>/dev/null || true
@@ -75,6 +78,7 @@ Push to main to auto-deploy via GitHub Pages/Vercel/Netlify.
 _Automated by Deploy Bot 🚀_
 REOF
 
+record_result "deploy-bot" "success" "completed" 2>/dev/null || true
 cat "$REPORT"
 
 notify "$(basename $BOT_NAME 2>/dev/null || basename $0)" "Bot completed successfully. Check report." 2>/dev/null || true

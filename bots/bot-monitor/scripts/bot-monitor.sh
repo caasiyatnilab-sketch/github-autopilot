@@ -1,6 +1,8 @@
 #!/bin/bash
 set -euo pipefail
+trap 'record_result "bot-monitor" "error" "script exited with error" 2>/dev/null || true' ERR
 source "${GITHUB_WORKSPACE:-.}/shared/utils.sh"
+source "${GITHUB_WORKSPACE:-.}/shared/state.sh"
 BOT="bot-monitor"; REPORT="bot-monitor-report.md"
 log INFO "🤖 Bot Monitor starting..."
 
@@ -180,6 +182,7 @@ echo "2. Consider adding auto-retry mechanisms for flaky bots" >> "$REPORT"
 echo "3. Monitor trends over time to detect degradation early" >> "$REPORT"
 echo "4. Share this report with team stakeholders" >> "$REPORT"
 
+record_result "bot-monitor" "success" "completed" 2>/dev/null || true
 cat "$REPORT"
 
 # Determine if we should alert on degradation

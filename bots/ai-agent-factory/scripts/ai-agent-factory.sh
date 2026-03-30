@@ -3,7 +3,9 @@
 # Builds and deploys advanced AI agent templates
 # Creates agents like OpenClaw/Kilo for free using freemium APIs
 set -euo pipefail
+trap 'record_result "ai-agent-factory" "error" "script exited with error" 2>/dev/null || true' ERR
 source "${GITHUB_WORKSPACE:-.}/shared/utils.sh"
+source "${GITHUB_WORKSPACE:-.}/shared/state.sh"
 
 BOT_NAME="ai-agent-factory"
 REPORT="ai-agent-factory-report.md"
@@ -423,6 +425,7 @@ Get free keys from:
 _Automated by AI Agent Factory 🧠_
 EOF
 
+record_result "ai-agent-factory" "success" "completed" 2>/dev/null || true
 cat "$REPORT"
 
 notify "$(basename $BOT_NAME 2>/dev/null || basename $0)" "Bot completed successfully. Check report." 2>/dev/null || true

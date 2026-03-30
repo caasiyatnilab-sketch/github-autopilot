@@ -3,7 +3,9 @@
 # Uses GitHub Issues for email + ntfy.sh for push
 # No third-party signup needed!
 set -euo pipefail
+trap 'record_result "notification-bot" "error" "script exited with error" 2>/dev/null || true' ERR
 source "${GITHUB_WORKSPACE:-.}/shared/utils.sh"
+source "${GITHUB_WORKSPACE:-.}/shared/state.sh"
 
 BOT_NAME="notification-bot"
 REPORT="notification-report.md"
@@ -186,6 +188,7 @@ Set these GitHub Secrets:
 _Automated by Notification Bot 📬_
 EOF
 
+record_result "notification-bot" "success" "completed" 2>/dev/null || true
 cat "$REPORT"
 
 notify "$(basename $BOT_NAME 2>/dev/null || basename $0)" "Bot completed successfully. Check report." 2>/dev/null || true

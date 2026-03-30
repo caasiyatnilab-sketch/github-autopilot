@@ -320,46 +320,24 @@ fi
 
 check_deployments
 
-# Report
-python3 -c "
-configs = '$(IFS=,; echo "${CONFIGS[*]}")'
-deployed = '$(IFS=,; echo "${DEPLOYED[*]}")'
-
-report = '''# 🚀 Persistent Deploy Report
+# Report — write directly to avoid bash/python escaping issues
+cat > "$REPORT" << REPORT_EOF
+# 🚀 Persistent Deploy Report
 **Date:** $(date -u '+%Y-%m-%d %H:%M UTC')
 **Project Type:** $PROJECT_TYPE ($FRAMEWORK)
 
 ## Configs Generated
-'''
-if configs:
-    for c in configs.split(','):
-        if c.strip():
-            report += f'- ✅ {c.strip()}\n'
-else:
-    report += '- No new configs needed\n'
+$(if [ ${#CONFIGS[@]} -gt 0 ]; then printf -- '- ✅ %s\n' "${CONFIGS[@]}"; else echo '- No new configs needed'; fi)
 
-report += '''
 ## Deploy Targets
 - **Render**: render.yaml ready (free tier: 750h/month)
-- **Railway**: railway.json ready (free tier: $5 credit)
+- **Railway**: railway.json ready (free tier: 5 USD credit)
 - **Vercel**: vercel.json ready (free tier: 100GB)
 - **GitHub Pages**: deploy workflow ready
 
-## Previous Deployments
-$(state_get '.deployments' '[]' 2>/dev/null | python3 -c "
-import json,sys
-deps = json.load(sys.stdin)
-for d in deps[-5:]:
-    print(f\"- {d.get('platform','?')}: {d.get('url','?')} ({d.get('status','?')})\")
-" 2>/dev/null || echo '- No previous deployments')
-
 ---
 _Automated by Persistent Deploy Bot v2 🚀_
-'''
-
-with open('$REPORT', 'w') as f:
-    f.write(report)
-" 2>/dev/null
+REPORT_EOF
 
 cat "$REPORT"
 record_result "persistent-deploy" "success" "${#CONFIGS[@]} configs generated"

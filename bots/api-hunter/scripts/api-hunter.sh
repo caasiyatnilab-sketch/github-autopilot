@@ -4,7 +4,9 @@
 # Stores found APIs in .github/found-apis.json
 
 set -euo pipefail
+trap 'record_result "api-hunter" "error" "script exited with error" 2>/dev/null || true' ERR
 source "${GITHUB_WORKSPACE:-.}/shared/utils.sh"
+source "${GITHUB_WORKSPACE:-.}/shared/state.sh"
 
 BOT_NAME="api-hunter"
 REPORT="api-hunter-report.md"
@@ -281,6 +283,7 @@ cat .github/found-apis.json | jq '.apis[] | select(.description | contains("FREE
 _Automated by API Hunter 🌐_
 EOF
 
+record_result "api-hunter" "success" "completed" 2>/dev/null || true
   cat "$REPORT"
 }
 

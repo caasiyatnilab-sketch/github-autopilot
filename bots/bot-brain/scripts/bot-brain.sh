@@ -5,7 +5,9 @@
 # API Injector → reads keys → injects into projects
 # Self-Upgrader → reads bot results → improves bots
 set -uo pipefail
+trap 'record_result "bot-brain" "error" "script exited with error" 2>/dev/null || true' ERR
 source "${GITHUB_WORKSPACE:-.}/shared/utils.sh"
+source "${GITHUB_WORKSPACE:-.}/shared/state.sh"
 
 REPORT="bot-brain-report.md"
 log INFO "🔗 Bot Brain starting..."
@@ -139,6 +141,7 @@ self_upgrade() {
     # Check for missing features
     if ! grep -q "notify" "$script" 2>/dev/null; then
       log INFO "  🔧 $bot: Adding notification support..."
+record_result "bot-brain" "success" "completed" 2>/dev/null || true
       sed -i '/cat "$REPORT"/a\notify "$(basename $0)" "Completed" 2>/dev/null || true' "$script" 2>/dev/null
       UPGRADES=$((UPGRADES+1))
     fi
@@ -285,6 +288,7 @@ done)
 _Automated by Bot Brain 🔗_
 REOF
 
+record_result "bot-brain" "success" "completed" 2>/dev/null || true
 cat "$REPORT"
 notify "Bot Brain" "System health: ${HEALTH}% | Active keys: $ACTIVE_KEYS | Upgrades: $UPGRADES"
 exit 0

@@ -3,7 +3,9 @@
 # Creates FULL websites/apps, deploys them, reports live URL
 # Multi-platform deploy: GitHub Pages, Vercel, Netlify, Surge, Cloudflare
 set -uo pipefail
+trap 'record_result "creator-bot" "error" "script exited with error" 2>/dev/null || true' ERR
 source "${GITHUB_WORKSPACE:-.}/shared/utils.sh"
+source "${GITHUB_WORKSPACE:-.}/shared/state.sh"
 
 REPORT="creator-report.md"
 log INFO "🏭 Creator Bot starting..."
@@ -708,6 +710,7 @@ $(ls -la creations/ 2>/dev/null | grep "^d" | awk '{print "- **" $NF "** (" $6 "
 _Automated by Creator Bot 🏭_
 REOF
 
+record_result "creator-bot" "success" "completed" 2>/dev/null || true
 cat "$REPORT"
 notify "Creator Bot" "Created ${#CREATIONS[@]} projects! Deploy to get live links."
 exit 0

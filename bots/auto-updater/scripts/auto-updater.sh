@@ -2,7 +2,9 @@
 # 📦 Auto Updater (Enhanced)
 # Checks, updates, fixes dependencies — auto-PR with changes
 set -uo pipefail
+trap 'record_result "auto-updater" "error" "script exited with error" 2>/dev/null || true' ERR
 source "${GITHUB_WORKSPACE:-.}/shared/utils.sh"
+source "${GITHUB_WORKSPACE:-.}/shared/state.sh"
 
 REPORT="auto-updater-report.md"
 log INFO "📦 Auto Updater starting..."
@@ -18,6 +20,7 @@ if [ ! -f "package.json" ]; then
 ---
 _Automated by Auto Updater 📦_
 REOF
+record_result "auto-updater" "success" "completed" 2>/dev/null || true
   cat "$REPORT"
   exit 0
 fi
@@ -85,6 +88,7 @@ $(if [ "$UPDATED" -eq 1 ]; then echo "✅ Updates applied. Auto-PR will be creat
 _Automated by Auto Updater 📦_
 REOF
 
+record_result "auto-updater" "success" "completed" 2>/dev/null || true
 cat "$REPORT"
 notify "Auto Updater" "Checked $COUNT packages. Fixes: ${FIXES:-none}"
 exit 0

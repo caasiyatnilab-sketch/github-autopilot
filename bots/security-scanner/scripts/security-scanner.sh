@@ -1,6 +1,9 @@
 #!/bin/bash
+BOT_NAME="security-scanner"
 set -euo pipefail
+trap 'record_result "security-scanner" "error" "script exited with error" 2>/dev/null || true' ERR
 source "${GITHUB_WORKSPACE:-.}/shared/utils.sh"
+source "${GITHUB_WORKSPACE:-.}/shared/state.sh"
 BOT="security-scanner"; REPORT="security-scanner-report.md"
 log INFO "🔒 Security Scanner starting..."
 VULNS=0; CRIT=0; HIGH=0; MOD=0; SECRETS_FOUND=0
@@ -40,6 +43,7 @@ $SECRETS_MSG
 $STATUS_MSG'''
 open('$REPORT', 'w').write(lines)
 "
+record_result "security-scanner" "success" "completed" 2>/dev/null || true
 cat "$REPORT"
 
 notify "$(basename $BOT_NAME 2>/dev/null || basename $0)" "Bot completed successfully. Check report." 2>/dev/null || true

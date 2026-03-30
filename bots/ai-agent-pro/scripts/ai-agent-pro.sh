@@ -3,7 +3,9 @@
 # Builds ADVANCED AI agents — like Kilo/OpenClaw level
 # Multi-provider, memory, tools, RAG, multi-modal, autonomous
 set -uo pipefail
+trap 'record_result "ai-agent-pro" "error" "script exited with error" 2>/dev/null || true' ERR
 source "${GITHUB_WORKSPACE:-.}/shared/utils.sh"
+source "${GITHUB_WORKSPACE:-.}/shared/state.sh"
 
 REPORT="ai-agent-pro-report.md"
 log INFO "🧠 AI Agent Factory Pro starting..."
@@ -580,6 +582,7 @@ npm install && npm start
 _Automated by AI Agent Factory Pro 🧠_
 REOF
 
+record_result "ai-agent-pro" "success" "completed" 2>/dev/null || true
 cat "$REPORT"
 notify "AI Agent Factory Pro" "Built ${#AGENTS_BUILT[@]} advanced AI agents!"
 exit 0
