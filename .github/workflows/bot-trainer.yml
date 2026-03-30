@@ -1,0 +1,24 @@
+name: 🎓 Bot Trainer
+on:
+  schedule: [{ cron: "0 6 * * 1" }]
+  workflow_dispatch: {}
+permissions: { contents: write, issues: write }
+jobs:
+  train:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { token: "${{ secrets.GITHUB_TOKEN }}" }
+      - name: 🎓 Train Bots
+        env:
+          GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          REPO: "${{ github.repository }}"
+          OPENROUTER_API_KEY: "${{ secrets.OPENROUTER_API_KEY }}"
+          OLLAMA_API_KEY: "${{ secrets.OLLAMA_API_KEY }}"
+        run: |
+          source shared/utils.sh
+          source shared/state.sh
+          bash bots/bot-trainer/scripts/bot-trainer.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: trainer-report, path: bot-trainer-report.md }

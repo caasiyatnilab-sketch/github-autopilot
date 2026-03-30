@@ -31,6 +31,12 @@
         "status": "success",
         "message": "0 configs generated",
         "timestamp": "2026-03-30T08:35:54Z"
+      },
+      {
+        "bot": "bot-trainer",
+        "status": "success",
+        "message": "4 training improvements",
+        "timestamp": "2026-03-30T09:13:25Z"
       }
     ],
     "bot_health": {
@@ -45,19 +51,76 @@
       "persistent-deploy": {
         "status": "success",
         "last_run": "2026-03-30T08:35:54Z"
+      },
+      "bot-trainer": {
+        "status": "success",
+        "last_run": "2026-03-30T09:13:25Z"
       }
     },
     "shared_data": {
       "evolver": {
         "review_index": 1,
         "last_ai_review": "2026-03-30"
+      },
+      "trainer": {
+        "last_ai_train": "2026-03-30"
       }
     },
     "evolution_log": [
       {
         "change": "AI reviewed ai-agent-factory",
         "timestamp": "2026-03-30T08:30:01Z"
+      },
+      {
+        "change": "Trained issue-pr-manager: added missing boilerplate",
+        "timestamp": "2026-03-30T09:12:36Z"
+      },
+      {
+        "change": "Trained persistent-deploy: added missing boilerplate",
+        "timestamp": "2026-03-30T09:12:36Z"
+      },
+      {
+        "change": "Trained scraper-bot: added missing boilerplate",
+        "timestamp": "2026-03-30T09:12:36Z"
+      },
+      {
+        "change": "Trained self-evolver: added missing boilerplate",
+        "timestamp": "2026-03-30T09:12:36Z"
+      },
+      {
+        "change": "AI trained auto-fixer",
+        "timestamp": "2026-03-30T09:13:25Z"
       }
     ]
-  }
+  },
+  "bot_scores": {
+    "ai-agent-factory": 90,
+    "ai-agent-pro": 85,
+    "ai-brain": 100,
+    "api-hunter": 90,
+    "auto-fixer": 80,
+    "auto-updater": 90,
+    "autopilot": 90,
+    "bot-brain": 90,
+    "bot-monitor": 90,
+    "bot-trainer": 90,
+    "copilot-rotator": 90,
+    "creator-bot": 85,
+    "daily-briefing": 90,
+    "deploy-bot": 90,
+    "free-api-hunter": 90,
+    "health-checker": 100,
+    "issue-pr-manager": 90,
+    "mega-deploy": 90,
+    "notification-bot": 90,
+    "persistent-deploy": 100,
+    "project-creator": 90,
+    "qa-bot": 90,
+    "repo-builder": 90,
+    "scraper-bot": 90,
+    "security-scanner": 100,
+    "self-evolver": 100,
+    "weekly-reporter": 90
+  },
+  "last_training": "2026-03-30T09:13:25Z"
 }

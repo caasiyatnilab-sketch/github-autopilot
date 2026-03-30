@@ -4,6 +4,7 @@
 # Uses AI to review bot scripts and suggest improvements
 # Rate-limit aware, caches results, respects free-tier limits
 set -uo pipefail
+trap 'log WARN "self-evolver interrupted"; exit 1' INT TERM
 source "${GITHUB_WORKSPACE:-.}/shared/utils.sh"
 source "${GITHUB_WORKSPACE:-.}/shared/state.sh"
 

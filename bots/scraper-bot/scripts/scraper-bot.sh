@@ -4,6 +4,7 @@
 # Scrapes: GitHub trending, Hacker News, Product Hunt, dev.to, Reddit
 # Stores results in shared state for other bots to consume
 set -uo pipefail
+trap 'log WARN "scraper-bot interrupted"; exit 1' INT TERM
 source "${GITHUB_WORKSPACE:-.}/shared/utils.sh"
 source "${GITHUB_WORKSPACE:-.}/shared/state.sh"
 

@@ -2,6 +2,7 @@
 set -euo pipefail
 trap 'record_result "issue-pr-manager" "error" "script exited with error" 2>/dev/null || true' ERR
 source "${GITHUB_WORKSPACE:-.}/shared/utils.sh"
+log INFO "issue-pr-manager starting..."
 source "${GITHUB_WORKSPACE:-.}/shared/state.sh"
 ACTION="${1:-all}"; REPORT="issue-pr-manager-report.md"
 

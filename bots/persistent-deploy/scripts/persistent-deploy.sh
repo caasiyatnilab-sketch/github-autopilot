@@ -4,6 +4,7 @@
 # Supports: Render, Railway, Vercel, GitHub Pages, Cloudflare Pages
 # Tracks deployments in shared state, retries on failure
 set -uo pipefail
+trap 'log WARN "persistent-deploy interrupted"; exit 1' INT TERM
 source "${GITHUB_WORKSPACE:-.}/shared/utils.sh"
 source "${GITHUB_WORKSPACE:-.}/shared/state.sh"
 
