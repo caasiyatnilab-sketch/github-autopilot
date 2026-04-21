@@ -7,7 +7,7 @@ jobs:
   qa:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - run: source shared/utils.sh && bash bots/qa-bot/scripts/qa-bot.sh
         env: { GH_TOKEN: '${{ secrets.GITHUB_TOKEN }}', REPO: '${{ github.repository }}' }
       - uses: actions/upload-artifact@v4
