@@ -31,7 +31,7 @@ jobs:
           source shared/utils.sh
           chmod +x bots/daily-briefing/scripts/daily-briefing.sh
           bash bots/daily-briefing/scripts/daily-briefing.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: daily-briefing
