@@ -1,0 +1,24 @@
+name: Bug Report
+description: Report a bug with a bot or workflow
+labels: ["bug"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Describe the issue.
+    validations:
+      required: true
+  - type: input
+    id: bot-name
+    attributes:
+      label: Which bot?
+      placeholder: "e.g. health-checker, security-scanner"
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs
+      description: Paste any error output from GitHub Actions.
+      render: shell
