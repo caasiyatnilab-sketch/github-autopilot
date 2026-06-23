@@ -9,7 +9,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: 🚀 Generate Deploy Configs
         env: { GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}", OPENROUTER_API_KEY: "${{ secrets.OPENROUTER_API_KEY }}", OLLAMA_API_KEY: "${{ secrets.OLLAMA_API_KEY }}", REPO: "${{ github.repository }}" }
         run: |
