@@ -6,13 +6,26 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Bots](https://img.shields.io/badge/Bots-20-blue.svg)](#bots)
 
-## 🚀 One-Line Install
+## 🚀 Secure Installation
 
+Running scripts directly from the internet is discouraged as a default security practice. We highly recommend downloading, inspecting, and verifying the setup script before execution:
+
+```bash
+# 1. Download the setup script
+curl -sSO https://raw.githubusercontent.com/caasiyatnilab-sketch/github-autopilot/main/setup.sh
+
+# 2. Inspect the script manually
+cat setup.sh
+
+# 3. Execute the setup script locally
+bash setup.sh
+```
+
+Alternatively, for a convenient one-liner installation:
 ```bash
 bash <(curl -s https://raw.githubusercontent.com/caasiyatnilab-sketch/github-autopilot/main/setup.sh)
 ```
-
-That's it. Your repo now has 20 bots running 24/7.
+*(Please ensure you trust this repository and connection security before piping remote scripts directly to bash).*
 
 ## 🤖 What It Does
 
@@ -48,7 +61,7 @@ That's it. Your repo now has 20 bots running 24/7.
 | 🕷️ Scraper Bot | Daily 4AM | Web scraping, data extraction |
 | 🚀 Deploy Bot | On push | GitHub Pages, Vercel, Netlify |
 | 🚀 Mega Deploy | On push | 10 platforms: Vercel, Netlify, Cloudflare, Surge, Firebase... |
-| 🔑 Copilot Rotator | Every 12h | API key health, free key discovery |
+| 🔑 Copilot Rotator | Every 12h | API key health, authorized free-tier key discovery |
 | 🧠 AI Agent Factory | Monday 10AM | Build chatbot, code reviewer, data analyst agents |
 | 🧠 AI Agent Pro | Monday 10AM | Kilo-level autonomous agents with tools & memory |
 | 🏭 Creator Bot | Monday 6AM | Creates full websites & apps |
