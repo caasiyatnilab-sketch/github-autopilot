@@ -3,13 +3,13 @@
     "groq": {
       "status": "active",
       "type": "ai",
-      "checked": "2026-07-28T02:46:16Z",
+      "checked": "2026-07-28T06:28:48Z",
       "auto_rotate": true
     },
     "openrouter": {
       "status": "active",
       "type": "ai",
-      "checked": "2026-07-28T02:46:16Z",
+      "checked": "2026-07-28T06:28:48Z",
       "auto_rotate": true
     }
   },
@@ -20,55 +20,13 @@
     "score": 40
   },
   "upgrades_needed": [],
-  "last_sync": "2026-07-28T02:46:16Z",
+  "last_sync": "2026-07-28T06:28:48Z",
   "auto_deploy": true,
   "self_upgrade": true,
-  "upgrades_applied": 9779,
-  "last_upgrade": "2026-07-28T02:46:17Z",
+  "upgrades_applied": 9790,
+  "last_upgrade": "2026-07-28T06:28:49Z",
   "": {
     "bot_results": [
-      {
-        "bot": "bot-brain",
-        "status": "success",
-        "message": "completed",
-        "timestamp": "2026-07-27T07:35:43Z"
-      },
-      {
-        "bot": "bot-brain",
-        "status": "success",
-        "message": "completed",
-        "timestamp": "2026-07-27T11:27:29Z"
-      },
-      {
-        "bot": "bot-brain",
-        "status": "success",
-        "message": "completed",
-        "timestamp": "2026-07-27T11:27:29Z"
-      },
-      {
-        "bot": "bot-brain",
-        "status": "success",
-        "message": "completed",
-        "timestamp": "2026-07-27T11:27:29Z"
-      },
-      {
-        "bot": "bot-brain",
-        "status": "success",
-        "message": "completed",
-        "timestamp": "2026-07-27T11:27:30Z"
-      },
-      {
-        "bot": "bot-brain",
-        "status": "success",
-        "message": "completed",
-        "timestamp": "2026-07-27T11:27:30Z"
-      },
-      {
-        "bot": "bot-brain",
-        "status": "success",
-        "message": "completed",
-        "timestamp": "2026-07-27T11:27:30Z"
-      },
       {
         "bot": "bot-brain",
         "status": "success",
@@ -326,6 +284,48 @@
         "status": "success",
         "message": "completed",
         "timestamp": "2026-07-28T02:46:17Z"
+      },
+      {
+        "bot": "bot-brain",
+        "status": "success",
+        "message": "completed",
+        "timestamp": "2026-07-28T06:28:49Z"
+      },
+      {
+        "bot": "bot-brain",
+        "status": "success",
+        "message": "completed",
+        "timestamp": "2026-07-28T06:28:49Z"
+      },
+      {
+        "bot": "bot-brain",
+        "status": "success",
+        "message": "completed",
+        "timestamp": "2026-07-28T06:28:49Z"
+      },
+      {
+        "bot": "bot-brain",
+        "status": "success",
+        "message": "completed",
+        "timestamp": "2026-07-28T06:28:49Z"
+      },
+      {
+        "bot": "bot-brain",
+        "status": "success",
+        "message": "completed",
+        "timestamp": "2026-07-28T06:28:49Z"
+      },
+      {
+        "bot": "bot-brain",
+        "status": "success",
+        "message": "completed",
+        "timestamp": "2026-07-28T06:28:49Z"
+      },
+      {
+        "bot": "bot-brain",
+        "status": "success",
+        "message": "completed",
+        "timestamp": "2026-07-28T06:28:49Z"
       }
     ],
     "bot_health": {
@@ -347,7 +347,7 @@
       },
       "bot-brain": {
         "status": "success",
-        "last_run": "2026-07-28T02:46:17Z"
+        "last_run": "2026-07-28T06:28:49Z"
       }
     },
     "shared_data": {
