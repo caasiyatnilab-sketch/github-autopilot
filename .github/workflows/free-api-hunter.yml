@@ -10,7 +10,7 @@ jobs:
       - uses: actions/checkout@v4
       - run: source shared/utils.sh && bash bots/free-api-hunter/scripts/free-api-hunter.sh
         env: { GH_TOKEN: '${{ secrets.GITHUB_TOKEN }}', REPO: '${{ github.repository }}' }
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with: { name: free-api-report, path: free-api-report.md }
       - name: 💾 Save API database

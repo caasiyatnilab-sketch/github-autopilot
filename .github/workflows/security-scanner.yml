@@ -15,6 +15,6 @@ jobs:
           npm ci 2>/dev/null || true
           source shared/utils.sh
           bash bots/security-scanner/scripts/security-scanner.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with: { name: security-report, path: security-scanner-report.md }
