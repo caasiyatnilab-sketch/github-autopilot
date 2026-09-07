@@ -16,6 +16,6 @@ jobs:
           npm ci 2>/dev/null || true
           source shared/utils.sh
           bash bots/auto-updater/scripts/auto-updater.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with: { name: update-report, path: auto-updater-report.md }

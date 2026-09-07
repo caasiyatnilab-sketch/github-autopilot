@@ -15,6 +15,6 @@ jobs:
           source shared/utils.sh
           source shared/state.sh
           bash bots/self-evolver/scripts/self-evolver.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with: { name: evolver-report, path: self-evolver-report.md }
